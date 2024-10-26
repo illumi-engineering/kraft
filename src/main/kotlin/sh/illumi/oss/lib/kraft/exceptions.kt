@@ -2,13 +2,36 @@ package sh.illumi.oss.lib.kraft
 
 import kotlin.reflect.KClass
 
+/**
+ * Base exception for Kraft exceptions
+ *
+ * @param message The exception message
+ */
 open class KraftException(message: String) : Exception(message)
 
-open class ServiceContainerException(open val serviceContainer: ServiceScope<*>, message: String)
+/**
+ * Base exception for service container exceptions
+ *
+ * @param serviceContainer The service container that the exception occurred in
+ * @param message The exception message
+ */
+open class ServiceContainerException(open val serviceContainer: ServiceLayer<*>, message: String)
     : KraftException("ServiceContainer[handle=${serviceContainer.depth}]: $message")
 
-class ServiceHasNoSuitableConstructorException(override val serviceContainer: ServiceScope<*>)
+/**
+ * Exception thrown when a service has no suitable constructor
+ * TODO: provide expected constructor signature in exception message
+ *
+ * @param serviceContainer The service container that the service is missing from
+ */
+class ServiceHasNoSuitableConstructorException(override val serviceContainer: ServiceLayer<*>)
     : ServiceContainerException(serviceContainer, "Service has no suitable constructor. TODO: provide expected constructor signature in exception message")
 
-class ServiceMissingRegisterAnnotationException(serviceKlass: KClass<out Service<*>>, override val serviceContainer: ServiceScope<*>)
-    : ServiceContainerException(serviceContainer, "Service missing @RegisterService annotation: ${serviceKlass.simpleName}")
+/**
+ * Exception thrown when a service is missing the [ServiceMetadata] annotation
+ *
+ * @param serviceClass The service class that is missing the annotation
+ * @param serviceContainer The service container that the service is missing from
+ */
+class ServiceMissingMetadataException(serviceClass: KClass<out Service<*>>, override val serviceContainer: ServiceLayer<*>)
+    : ServiceContainerException(serviceContainer, "Service missing @RegisterService annotation: ${serviceClass.simpleName}")
