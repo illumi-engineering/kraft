@@ -1,10 +1,11 @@
 package sh.illumi.oss.lib.kraft
 
-import kotlinx.coroutines.CoroutineScope
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 
-abstract class ServiceLayer<TLayer : ServiceLayer<TLayer>> {
+import kotlinx.coroutines.CoroutineScope
+
+abstract class ApplicationLayer<TLayer : ApplicationLayer<TLayer>> {
     abstract val coroutineScope: CoroutineScope
     abstract val depth: Int
     abstract val handle: Int
@@ -62,7 +63,7 @@ abstract class ServiceLayer<TLayer : ServiceLayer<TLayer>> {
      * @return The class of the layer at the given index
      * @throws KraftException If the layer has no parent, and we are not at the root layer.
       */
-    fun getClassForIndex(index: Int): KClass<out ServiceLayer<*>> =
+    fun getClassForIndex(index: Int): KClass<out ApplicationLayer<*>> =
         if (index == 0) this.javaClass.kotlin
         else if (this is LayerWithParent<*>) this.parentLayer.getClassForIndex(index - 1)
         else throw KraftException("ServiceLayer[handle=$handle,depth=$depth] does not have a parent") // todo: better error reporting & handling
@@ -75,9 +76,9 @@ abstract class ServiceLayer<TLayer : ServiceLayer<TLayer>> {
      *
      * @see LayerWithParent
      */
-    fun getLayerStack(): List<ServiceLayer<*>> {
-        val scopeStack = mutableListOf<ServiceLayer<*>>()
-        var currentScope: ServiceLayer<*> = this
+    fun getLayerStack(): List<ApplicationLayer<*>> {
+        val scopeStack = mutableListOf<ApplicationLayer<*>>()
+        var currentScope: ApplicationLayer<*> = this
 
         while (currentScope is LayerWithParent<*>) {
             scopeStack += currentScope
@@ -159,7 +160,7 @@ abstract class ServiceLayer<TLayer : ServiceLayer<TLayer>> {
  * @param TParentLayer The type of the parent layer
  * @property parentLayer The parent layer
  */
-interface LayerWithParent<TParentLayer : ServiceLayer<TParentLayer>> {
+interface LayerWithParent<TParentLayer : ApplicationLayer<TParentLayer>> {
     val parentLayer: TParentLayer
 }
 
@@ -171,7 +172,7 @@ interface LayerWithParent<TParentLayer : ServiceLayer<TParentLayer>> {
  * @property activeChildLayer The currently active child layer
  * @property backgroundChildLayers The background child layers
  */
-interface LayerWithChildren<TChildLayer : ServiceLayer<TChildLayer>> {
+interface LayerWithChildren<TChildLayer : ApplicationLayer<TChildLayer>> {
     var activeChildLayer: TChildLayer
     val backgroundChildLayers: MutableList<TChildLayer>
 }
@@ -182,12 +183,12 @@ interface LayerWithChildren<TChildLayer : ServiceLayer<TChildLayer>> {
  * @param TChildLayer The type of the child layer
  *
  * @property coroutineScope The coroutine scope for this layer
- * @property depth The depth of this layer in the tree. Defaults to [ServiceLayer.ROOT_DEPTH]
- * @property handle The handle for the root layer. Defaults to [ServiceLayer.ROOT_HANDLE]
+ * @property depth The depth of this layer in the tree. Defaults to [ApplicationLayer.ROOT_DEPTH]
+ * @property handle The handle for the root layer. Defaults to [ApplicationLayer.ROOT_HANDLE]
  */
-abstract class RootLayer<TChildLayer : ServiceLayer<TChildLayer>>(
+abstract class RootLayer<TChildLayer : ApplicationLayer<TChildLayer>>(
     override val coroutineScope: CoroutineScope
-) : ServiceLayer<RootLayer<TChildLayer>>(),
+) : ApplicationLayer<RootLayer<TChildLayer>>(),
     LayerWithChildren<TChildLayer>
 {
     override val depth: Int = ROOT_DEPTH
@@ -208,12 +209,12 @@ abstract class RootLayer<TChildLayer : ServiceLayer<TChildLayer>>(
  * @property backgroundChildLayers The background child layers
  */
 abstract class MidLayer<
-    TParentLayer : ServiceLayer<TParentLayer>,
-    TChildLayer : ServiceLayer<TChildLayer>
+    TParentLayer : ApplicationLayer<TParentLayer>,
+    TChildLayer : ApplicationLayer<TChildLayer>
 > (
     final override val parentLayer: TParentLayer,
     override val coroutineScope: CoroutineScope
-) : ServiceLayer<MidLayer<TParentLayer, TChildLayer>>(),
+) : ApplicationLayer<MidLayer<TParentLayer, TChildLayer>>(),
     LayerWithParent<TParentLayer>,
     LayerWithChildren<TChildLayer>
 {
@@ -231,10 +232,10 @@ abstract class MidLayer<
  * @property depth The depth of this layer in the tree
  * @property handle The handle for this layer
  */
-abstract class LeafLayer<TParentLayer : ServiceLayer<TParentLayer>>(
+abstract class LeafLayer<TParentLayer : ApplicationLayer<TParentLayer>>(
     final override val parentLayer: TParentLayer,
     override val coroutineScope: CoroutineScope
-) : ServiceLayer<LeafLayer<TParentLayer>>(),
+) : ApplicationLayer<LeafLayer<TParentLayer>>(),
     LayerWithParent<TParentLayer>
 {
     override val depth: Int = parentLayer.depth + 1

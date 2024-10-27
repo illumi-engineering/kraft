@@ -15,7 +15,7 @@ open class KraftException(message: String) : Exception(message)
  * @param serviceContainer The service container that the exception occurred in
  * @param message The exception message
  */
-open class ServiceContainerException(open val serviceContainer: ServiceLayer<*>, message: String)
+open class ServiceContainerException(open val serviceContainer: ApplicationLayer<*>, message: String)
     : KraftException("ServiceContainer[handle=${serviceContainer.depth}]: $message")
 
 /**
@@ -24,7 +24,7 @@ open class ServiceContainerException(open val serviceContainer: ServiceLayer<*>,
  *
  * @param serviceContainer The service container that the service is missing from
  */
-class ServiceHasNoSuitableConstructorException(override val serviceContainer: ServiceLayer<*>)
+class ServiceHasNoSuitableConstructorException(override val serviceContainer: ApplicationLayer<*>)
     : ServiceContainerException(serviceContainer, "Service has no suitable constructor. TODO: provide expected constructor signature in exception message")
 
 /**
@@ -33,5 +33,5 @@ class ServiceHasNoSuitableConstructorException(override val serviceContainer: Se
  * @param serviceClass The service class that is missing the annotation
  * @param serviceContainer The service container that the service is missing from
  */
-class ServiceMissingMetadataException(serviceClass: KClass<out Service<*>>, override val serviceContainer: ServiceLayer<*>)
+class ServiceMissingMetadataException(serviceClass: KClass<out Service<*>>, override val serviceContainer: ApplicationLayer<*>)
     : ServiceContainerException(serviceContainer, "Service missing @RegisterService annotation: ${serviceClass.simpleName}")
