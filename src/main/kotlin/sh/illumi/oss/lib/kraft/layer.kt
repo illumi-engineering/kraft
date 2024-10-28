@@ -40,11 +40,11 @@ interface ApplicationLayer<TLayer : ApplicationLayer<TLayer>> {
      * @return The class of the layer at the given index
      * @throws KraftException If the layer has no parent, and we are not at the root layer.
       */
-    fun getClassForIndex(index: Int): KClass<out ApplicationLayer<*>> =
-        if (index == 0) this.javaClass.kotlin
-        else if (this is LayerWithParent<*>) this.parentLayer.getClassForIndex(index - 1)
-        // todo: better error handling
-        else throw KraftException("${this.javaClass.kotlin.simpleName}[handle=$handle,depth=$depth] does not have a parent")
+    fun getClassForIndex(index: Int): KClass<out ApplicationLayer<*>> {
+        val layers = getLayersToRoot().reversed()
+        println(layers.map { it.javaClass.kotlin.simpleName })
+        return layers[index].javaClass.kotlin
+    }
 
     /**
      * Get all the layers from this layer to the root layer
