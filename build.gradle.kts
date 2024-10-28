@@ -15,6 +15,9 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
     implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.slf4j)
+
+    implementation(libs.slf4j.api)
 
     testImplementation(kotlin("test"))
     testImplementation(libs.kotlinx.coroutines.test)

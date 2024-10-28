@@ -1,6 +1,8 @@
 package sh.illumi.oss.lib.kraft
 
 import kotlinx.coroutines.*
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import sh.illumi.oss.lib.kraft.service.Service
 import kotlin.reflect.KClass
 
@@ -67,6 +69,8 @@ interface ApplicationLayer<TLayer : ApplicationLayer<TLayer>> {
 
         return layers
     }
+
+    val log: Logger get() = LoggerFactory.getLogger(this::class.java)
 
     companion object {
         /**
