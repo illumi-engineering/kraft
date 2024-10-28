@@ -1,20 +1,22 @@
 package sh.illumi.oss.lib.kraft.service
 
 import sh.illumi.oss.lib.kraft.ApplicationLayer
-import sh.illumi.oss.lib.kraft.ServiceMissingMetadataException
+import sh.illumi.oss.lib.kraft.KraftException
 import kotlin.reflect.KClass
 
 /**
  * Metadata annotation for services
  *
  * @param key The key to use for identifying the service
- * @param scopes The scopes that this service is available in
+ * @param dependencies The services that this service depends on
+ * @param layers The scopes that this service is available in
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class ServiceMetadata(
     val key: String,
-    val scopes: IntArray = [ApplicationLayer.ROOT_DEPTH],
+    val dependencies: Array<KClass<out Service>> = [],
+    val layers: IntArray = [ApplicationLayer.ROOT_HANDLE],
 ) {
     companion object {
         /**
@@ -24,12 +26,10 @@ annotation class ServiceMetadata(
          * @param serviceContainer The service container that is attempting to resolve the service
          *
          * @return The resolved annotation
-         *
-         * @throws ServiceMissingMetadataException If the service class has no suitable annotation
          */
-        fun resolveAnnotation(serviceClass: KClass<out Service<*>>, serviceContainer: ServiceContainer) =
+        fun resolveAnnotation(serviceClass: KClass<out Service>, serviceContainer: ServiceContainer) =
             serviceClass.annotations.first {
-                it is ServiceMetadata && it.scopes.contains(serviceContainer.applicationLayer.handle)
-            } as? ServiceMetadata ?: throw ServiceMissingMetadataException(serviceClass, serviceContainer)
+                it is ServiceMetadata && it.layers.contains(serviceContainer.applicationLayer.handle)
+            } as? ServiceMetadata ?: throw KraftException("Service ${serviceClass.simpleName} has no suitable ServiceMetadata annotation")
     }
 }

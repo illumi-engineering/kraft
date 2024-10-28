@@ -1,16 +1,12 @@
 package sh.illumi.oss.lib.kraft.service
 
-import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineScope
 
 /**
- * Base class for services
+ * Base interface for services
  *
- * @param TConfig The configuration type for the service
- *
- * @property coroutineContext The coroutine context to use for the service
+ * @property coroutineScope The coroutine scope of the service's layer
  */
-abstract class Service<TConfig>(
-    protected val coroutineContext: CoroutineContext // todo: do we need this?
-) {
-    abstract fun getConfig(): TConfig
+interface Service {
+    val coroutineScope: CoroutineScope
 }
