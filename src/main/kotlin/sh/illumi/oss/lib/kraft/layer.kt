@@ -3,6 +3,7 @@ package sh.illumi.oss.lib.kraft
 import kotlinx.coroutines.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import sh.illumi.oss.lib.kraft.resource.ResourceProvider
 import sh.illumi.oss.lib.kraft.service.Service
 import kotlin.reflect.KClass
 
