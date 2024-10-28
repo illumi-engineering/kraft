@@ -8,14 +8,12 @@ import sh.illumi.oss.lib.kraft.service.ServiceContainer
 
 /**
  * Each layer in an application represents a different scope of services,
- * resources, and logic. Layers can be nested, with each layer having a parent
- * layer and zero or more child layers. [ApplicationLayer] is the base class for
- * all layers in the application. [RootLayer] is the root layer in the runtime,
- * having no parent and zero or more child layers. [MidLayer] is a layer with a
- * parent and zero or more child layers. [LeafLayer] is a layer with a parent
- * and no child layers. In this way, applications can derive layers based off of
- * necessary context and functionality, while also keeping outer context and
- * [services] in scope.
+ * resources, and logic. Layers can be nested, and can optionally expose their
+ * resources to child layers programmatically. [ApplicationLayer] is the base
+ * class for all layers in the application. [RootLayer] is the root layer in the
+ * runtime, having no parent and zero or more child layers. In this way,
+ * applications can derive layers based off of necessary context and
+ * functionality, while also keeping outer context and [services] in scope.
  *
  * todo: provide an example here
  *
@@ -71,10 +69,28 @@ interface ApplicationLayer<TLayer : ApplicationLayer<TLayer>> {
     }
 
     companion object {
+        /**
+         * The depth of the root layer
+         */
         const val ROOT_DEPTH = 0
+
+        /**
+         * The handle for the root layer
+         */
         const val ROOT_HANDLE = 0
+
+        /**
+         * The maximum depth of a layer
+         * todo: allow this to be set by the caller so that it can be adjusted based on the application's needs
+         */
         private const val MAX_DEPTH = 16 // a depth of 16 layers should be more than enough for any practical use case
+
+        /**
+         * The maximum number of handles, and consequently layers that may be created
+         * todo: allow this to be set by the caller so that it can be adjusted based on the application's needs
+         */
         private const val MAX_HANDLES: Int = Int.MAX_VALUE
+
         private var nextHandle: Int = ROOT_HANDLE + 1
 
         /**
