@@ -1,21 +1,8 @@
-package sh.illumi.oss.lib.kraft
+package sh.illumi.oss.lib.kraft.service
 
+import sh.illumi.oss.lib.kraft.ApplicationLayer
+import sh.illumi.oss.lib.kraft.ServiceMissingMetadataException
 import kotlin.reflect.KClass
-
-import kotlinx.coroutines.CoroutineScope
-
-/**
- * Base class for services
- *
- * @param TConfig The configuration type for the service
- *
- * @property coroutineScope The coroutine scope to use for the service
- */
-abstract class Service<TConfig>(
-    private val coroutineScope : CoroutineScope
-) {
-    abstract fun getConfig(): TConfig
-}
 
 /**
  * Metadata annotation for services
@@ -34,15 +21,15 @@ annotation class ServiceMetadata(
          * Resolve the [ServiceMetadata] annotation for a service class
          *
          * @param serviceClass The service class to resolve the annotation for
-         * @param scope The scope to resolve the annotation for
+         * @param serviceContainer The service container that is attempting to resolve the service
          *
          * @return The resolved annotation
          *
          * @throws ServiceMissingMetadataException If the service class has no suitable annotation
          */
-        fun <TScope : ApplicationLayer<*>> resolveAnnotation(serviceClass: KClass<out Service<*>>, scope: TScope) =
+        fun resolveAnnotation(serviceClass: KClass<out Service<*>>, serviceContainer: ServiceContainer) =
             serviceClass.annotations.first {
-                it is ServiceMetadata && it.scopes.contains(scope.depth)
-            } as? ServiceMetadata ?: throw ServiceMissingMetadataException(serviceClass, scope)
+                it is ServiceMetadata && it.scopes.contains(serviceContainer.applicationLayer.handle)
+            } as? ServiceMetadata ?: throw ServiceMissingMetadataException(serviceClass, serviceContainer)
     }
 }

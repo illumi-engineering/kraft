@@ -1,61 +1,37 @@
 package sh.illumi.oss.lib.kraft
 
 import kotlin.reflect.KClass
-import kotlin.reflect.KFunction
 
 import kotlinx.coroutines.CoroutineScope
+import sh.illumi.oss.lib.kraft.service.ServiceContainer
 
-abstract class ApplicationLayer<TLayer : ApplicationLayer<TLayer>> {
-    abstract val coroutineScope: CoroutineScope
+/**
+ * Each layer in an application represents a different scope of services,
+ * resources, and logic. Layers can be nested, with each layer having a parent
+ * layer and zero or more child layers. [ApplicationLayer] is the base class for
+ * all layers in the application. [RootLayer] is the root layer in the runtime,
+ * having no parent and zero or more child layers. [MidLayer] is a layer with a
+ * parent and zero or more child layers. [LeafLayer] is a layer with a parent
+ * and no child layers. In this way, applications can derive layers based off of
+ * necessary context and functionality, while also keeping outer context and
+ * [services] in scope.
+ *
+ * todo: provide an example here
+ *
+ * @param TLayer The type of the layer
+ *
+ * @property depth The depth of the layer in the layer tree
+ * @property handle An identifying handle for the layer
+ *
+ */
+abstract class ApplicationLayer<TLayer : ApplicationLayer<TLayer>> : CoroutineScope {
     abstract val depth: Int
-    abstract val handle: Int
+    abstract val handle: Int // todo: come up with a better system for identifying layers
 
-    private val services = mutableMapOf<String, Service<*>>()
+    private val resourceProviders = mutableMapOf<String, ResourceProvider<*>>()
 
-    val expectedParamsLength: Int
-        get() = depth + 2
-
-    /**
-     * Instantiate a service of type [TService] in this layer
-     *
-     * @return The instantiated service
-     *
-     * @throws ServiceHasNoSuitableConstructorException If the service has no suitable constructor
-     * @throws KraftException If the service layer has no parent
-     *
-     * @see getConstructor
-     * @see getLayerStack
-     */
-    inline fun <reified TService : Service<*>> instantiateService(): TService =
-        getConstructor<TService>()
-            .call(
-                coroutineScope,
-                *getLayerStack().toTypedArray()
-            )
-
-    /**
-     * Get the correct constructor for a service of type [TService] in this layer
-     *
-     * @return The constructor for the service
-     * @throws ServiceHasNoSuitableConstructorException If the service has no suitable constructor
-     * @throws KraftException If the service layer has no parent
-     *
-     * @see getClassForIndex
-     */
-    inline fun <reified TService : Service<*>> getConstructor(): KFunction<TService> =
-        TService::class.constructors.firstOrNull {
-            if (it.parameters.size != expectedParamsLength) return@firstOrNull false
-
-            for ((index, parameter) in it.parameters.withIndex()) {
-                when (index) {
-                    0 -> if (parameter.type.classifier != CoroutineScope::class) return@firstOrNull false
-                    else -> if (parameter.type.classifier != getClassForIndex(index)) return@firstOrNull false
-                }
-            }
-
-            true
-        } ?: throw ServiceHasNoSuitableConstructorException(this)
-
+    @Suppress("LeakingThis")
+    private val services = ServiceContainer(this)
     /**
      * Get the class for a given [index] in the layer tree
      *
@@ -66,65 +42,54 @@ abstract class ApplicationLayer<TLayer : ApplicationLayer<TLayer>> {
     fun getClassForIndex(index: Int): KClass<out ApplicationLayer<*>> =
         if (index == 0) this.javaClass.kotlin
         else if (this is LayerWithParent<*>) this.parentLayer.getClassForIndex(index - 1)
-        else throw KraftException("ServiceLayer[handle=$handle,depth=$depth] does not have a parent") // todo: better error reporting & handling
+        // todo: better error handling
+        else throw KraftException("${this.javaClass.kotlin.simpleName}[handle=$handle,depth=$depth] does not have a parent")
 
     /**
-     * Get the layer stack for this layer
+     * Get all the layers from this layer to the root layer
      *
      * @return A list of layers from the root to this layer
      * @throws KraftException If the root layer is not present
      *
      * @see LayerWithParent
      */
-    fun getLayerStack(): List<ApplicationLayer<*>> {
-        val scopeStack = mutableListOf<ApplicationLayer<*>>()
-        var currentScope: ApplicationLayer<*> = this
+    fun getLayersToRoot(): List<ApplicationLayer<*>> {
+        val layers = mutableListOf<ApplicationLayer<*>>()
+        var currentLayer: ApplicationLayer<*> = this
 
-        while (currentScope is LayerWithParent<*>) {
-            scopeStack += currentScope
-            currentScope = currentScope.parentLayer
+        while (currentLayer is LayerWithParent<*> || currentLayer is RootLayer<*>) {
+            layers += currentLayer
+
+            if (currentLayer is LayerWithParent<*>) currentLayer = currentLayer.parentLayer
+            else break
         }
 
-        // todo: maybe there's a better way to do this?
-        if (currentScope is RootLayer<*>) scopeStack += currentScope
-        else throw KraftException("ServiceScope does not have a root layer!")
-
-        // the root layer should be at the start of the list
-        return scopeStack.reversed()
+        return layers
     }
 
     /**
-     * Register a [service] in this layer. You can call this method with a
-     * service that has already been registered. It should not have any effect.
+     * Get all the layers from this layer to a layer of a specific type.
      *
-     * @param service The service to register
-     */
-    fun registerService(service: Service<*>) {
-        val annotation = ServiceMetadata.resolveAnnotation(service.javaClass.kotlin, this)
-        if (services.containsKey(annotation.key)) return
-        services[annotation.key] = service
-    }
-
-    /**
-     * Get a service by its [key][serviceKey]
+     * @return A list of layers from this layer to the target layer
      *
-     * @return The service with the given key, or null if it doesn't exist
+     * @see LayerWithParent
      */
-    fun getService(serviceKey: String): Service<*>? = services[serviceKey]
+    inline fun <reified TTargetLayer : ApplicationLayer<*>> getLayersToTyped(): List<ApplicationLayer<*>> {
+        val layers = mutableListOf<ApplicationLayer<*>>()
+        var currentLayer: ApplicationLayer<*> = this
 
-    /**
-     * Get a service by type or create and register one if it hasn't been
-     * instantiated.
-     *
-     * @return The service of type [TService]
-     * @throws ServiceHasNoSuitableConstructorException If the service has no suitable constructor
-     * @throws KraftException If the service layer stack has no root or a parent is missing before the root layer
-     */
-    inline fun <reified TService : Service<*>> service(): TService {
-        val annotation = ServiceMetadata.resolveAnnotation(TService::class, this)
+        while (currentLayer !is TTargetLayer && (currentLayer is LayerWithParent<*> || currentLayer is RootLayer<*>)) {
+            layers += currentLayer
 
-        return getService(annotation.key) as? TService
-            ?: instantiateService<TService>().also { registerService(it) }
+            if (currentLayer is LayerWithParent<*>) currentLayer = currentLayer.parentLayer
+            else break
+        }
+
+        if (currentLayer !is TTargetLayer) {
+            throw KraftException("${this.javaClass.kotlin.simpleName}[handle=$handle,depth=$depth] has no parent of type ${TTargetLayer::class.simpleName}")
+        }
+
+        return layers
     }
 
     companion object {
@@ -143,7 +108,7 @@ abstract class ApplicationLayer<TLayer : ApplicationLayer<TLayer>> {
          */
         fun nextHandle(): Int {
             if (nextHandle - 1 == MAX_HANDLES) {
-                throw KraftException("ServiceScope handles exhausted")
+                throw KraftException("ApplicationLayer handles exhausted")
             }
 
             val handle = nextHandle
@@ -182,13 +147,11 @@ interface LayerWithChildren<TChildLayer : ApplicationLayer<TChildLayer>> {
  *
  * @param TChildLayer The type of the child layer
  *
- * @property coroutineScope The coroutine scope for this layer
  * @property depth The depth of this layer in the tree. Defaults to [ApplicationLayer.ROOT_DEPTH]
  * @property handle The handle for the root layer. Defaults to [ApplicationLayer.ROOT_HANDLE]
  */
-abstract class RootLayer<TChildLayer : ApplicationLayer<TChildLayer>>(
-    override val coroutineScope: CoroutineScope
-) : ApplicationLayer<RootLayer<TChildLayer>>(),
+abstract class RootLayer<TChildLayer : ApplicationLayer<TChildLayer>> :
+    ApplicationLayer<RootLayer<TChildLayer>>(),
     LayerWithChildren<TChildLayer>
 {
     override val depth: Int = ROOT_DEPTH
@@ -202,7 +165,6 @@ abstract class RootLayer<TChildLayer : ApplicationLayer<TChildLayer>>(
  * @param TChildLayer The type of the child layer
  *
  * @property parentLayer The parent layer
- * @property coroutineScope The coroutine scope for this layer
  * @property depth The depth of this layer in the tree
  * @property handle The handle for this layer
  * @property activeChildLayer The currently active child layer
@@ -213,7 +175,6 @@ abstract class MidLayer<
     TChildLayer : ApplicationLayer<TChildLayer>
 > (
     final override val parentLayer: TParentLayer,
-    override val coroutineScope: CoroutineScope
 ) : ApplicationLayer<MidLayer<TParentLayer, TChildLayer>>(),
     LayerWithParent<TParentLayer>,
     LayerWithChildren<TChildLayer>
@@ -228,13 +189,11 @@ abstract class MidLayer<
  * @param TParentLayer The type of the parent layer
  *
  * @property parentLayer The parent of this leaf layer
- * @property coroutineScope The coroutine scope for this layer
  * @property depth The depth of this layer in the tree
  * @property handle The handle for this layer
  */
 abstract class LeafLayer<TParentLayer : ApplicationLayer<TParentLayer>>(
     final override val parentLayer: TParentLayer,
-    override val coroutineScope: CoroutineScope
 ) : ApplicationLayer<LeafLayer<TParentLayer>>(),
     LayerWithParent<TParentLayer>
 {
