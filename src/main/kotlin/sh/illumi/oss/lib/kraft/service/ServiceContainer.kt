@@ -21,7 +21,6 @@ class ServiceContainer(
      *
      * @return The instantiated service
      *
-     * @throws ServiceHasNoSuitableConstructorException If the service has no suitable constructor
      * @throws KraftException If the service layer has no parent
      *
      * @see getServiceConstructor
@@ -38,7 +37,6 @@ class ServiceContainer(
      * Get the correct constructor for a service of type [TService] in this layer
      *
      * @return The constructor for the service
-     * @throws ServiceHasNoSuitableConstructorException If the service has no suitable constructor
      * @throws KraftException If the service layer has no parent
      *
      * @see ApplicationLayer.getClassForIndex
@@ -69,7 +67,6 @@ class ServiceContainer(
      * instantiated.
      *
      * @return The service of type [TService]
-     * @throws ServiceHasNoSuitableConstructorException If the service has no suitable constructor
      * @throws KraftException If the service layer stack has no root or a parent is missing before the root layer
      */
     inline fun <reified TService : Service> get(): TService {
@@ -82,8 +79,6 @@ class ServiceContainer(
     /**
      * Register a [Service] in this layer. You can call this method with a
      * service that has already been registered. It should not have any effect.
-     *
-     * @throws ServiceMissingMetadataException If the service is missing the [ServiceMetadata] annotation
      */
     inline fun <reified TService : Service> register() {
         put(instantiateService<TService>())
@@ -94,7 +89,6 @@ class ServiceContainer(
      * that are instantiated outside the container.
      *
      * @param service The service to track
-     * @throws ServiceMissingMetadataException If the service is missing the [ServiceMetadata] annotation
      */
     fun put(service: Service) {
         val annotation = ServiceMetadata.resolveAnnotation(service.javaClass.kotlin, this)

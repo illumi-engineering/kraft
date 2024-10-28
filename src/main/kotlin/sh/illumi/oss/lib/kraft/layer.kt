@@ -45,7 +45,7 @@ interface ApplicationLayer<TLayer : ApplicationLayer<TLayer>> {
       */
     fun getClassForIndex(index: Int): KClass<out ApplicationLayer<*>> {
         val layers = getLayersToRoot().reversed()
-        println(layers.map { it.javaClass.kotlin.simpleName })
+//        println(layers.map { it.javaClass.kotlin.simpleName })
         return layers[index].javaClass.kotlin
     }
 
