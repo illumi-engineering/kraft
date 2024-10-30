@@ -1,14 +1,17 @@
 package sh.illumi.kraft.service
 
 import kotlinx.coroutines.CoroutineScope
-import sh.illumi.kraft.ApplicationLayer
+import sh.illumi.kraft.KraftException
 import sh.illumi.kraft.ServiceContainerException
-import sh.illumi.kraft.*
+import sh.illumi.kraft.layer.ApplicationLayer
 import kotlin.reflect.KFunction
+import kotlin.reflect.KProperty
 
-class ServiceContainer(
-    val applicationLayer: ApplicationLayer<*>
-) {
+class ServiceContainer<TLayer>(
+    val applicationLayer: TLayer
+) where
+    TLayer : ApplicationLayer<TLayer>
+{
     private val services = mutableMapOf<String, Service>()
 
     /**
@@ -98,5 +101,5 @@ class ServiceContainer(
         services[annotation.key] = service
     }
 
-    inline operator fun <reified TService : Service> getValue(thisRef: Any?, prop: Any): TService = get()
+    inline operator fun <reified TService : Service> getValue(thisRef: TLayer?, prop: KProperty<*>): TService = get()
 }

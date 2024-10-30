@@ -1,7 +1,7 @@
 package sh.illumi.kraft.resource
 
-import sh.illumi.kraft.ApplicationLayer
-import java.util.ServiceLoader
+import sh.illumi.kraft.layer.ApplicationLayer
+import java.util.*
 
 class ResourceProviderFactory(val applicationLayer: ApplicationLayer<*>) {
     val serviceLoader = ServiceLoader.load(ResourceProvider::class.java)

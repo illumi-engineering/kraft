@@ -1,13 +1,13 @@
-package sh.illumi.kraft
+package sh.illumi.kraft.layer
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import sh.illumi.kraft.KraftException
 import sh.illumi.kraft.resource.ResourceProvider
 import sh.illumi.kraft.service.Service
-import kotlin.reflect.KClass
-
 import sh.illumi.kraft.service.ServiceContainer
+import kotlin.reflect.KClass
 
 /**
  * Each layer in an application represents a different scope of services,
@@ -42,7 +42,7 @@ interface ApplicationLayer<TLayer : ApplicationLayer<TLayer>> {
      * @param index The index of the layer in the layer tree
      * @return The class of the layer at the given index
      * @throws KraftException If the layer has no parent, and we are not at the root layer.
-      */
+     */
     fun getClassForIndex(index: Int): KClass<out ApplicationLayer<*>> {
         val layers = getLayersToRoot().reversed()
 //        println(layers.map { it.javaClass.kotlin.simpleName })
@@ -144,87 +144,3 @@ inline fun <TLayer : ApplicationLayer<TLayer>, reified TTargetLayer : Applicatio
 }
 
 inline fun <TLayer : ApplicationLayer<TLayer>, reified TService : Service> ApplicationLayer<TLayer>.service() = services.get<TService>()
-
-/**
- * A service layer with a parent
- *
- * @param TParentLayer The type of the parent layer
- * @property parentLayer The parent layer
- */
-interface LayerWithParent<TParentLayer : ApplicationLayer<TParentLayer>> {
-    val parentLayer: TParentLayer
-}
-
-/**
- * A service layer with children
- *
- * @param TChildLayer The type of the child layer
- * @property childLayers The background child layers
- */
-interface LayerWithChildren<TChildLayer : ApplicationLayer<TChildLayer>> {
-    val childLayers: MutableList<ApplicationLayer<*>>
-}
-
-/**
- * Get a child layer of a specific type
- *
- * @param TChildLayer The type of the child layer
- * @return The child layer of the specified type
- *
- * @throws KraftException If no child layer of the specified type is found
- * todo: better exception
- */
-inline fun <
-    reified TChildLayer : ApplicationLayer<TChildLayer>,
-> LayerWithChildren<TChildLayer>.getChildLayer() = childLayers
-    .filterIsInstance<TChildLayer>()
-    .firstOrNull() ?: throw KraftException("No child layer of type ${TChildLayer::class.simpleName} found")
-
-/**
- * Run the given [block] on a child layer of a specific type [TChildLayer]
- *
- * @param TChildLayer The type of the child layer
- * @param TReturn The return type of the block
- * @param block The block to run on the child layer
- *
- * @return The result of the block
- *
- * @throws KraftException If no child layer of the specified type is found
- */
-inline fun <
-    reified TChildLayer,
-    TReturn : Any,
-> LayerWithChildren<TChildLayer>.withChildLayerReturning(
-    noinline block: suspend TChildLayer.() -> TReturn,
-) where
-    TChildLayer : ApplicationLayer<TChildLayer>
-= (this as ApplicationLayer<*>).coroutineScope.async { // this cast will always succeed
-    getChildLayer<TChildLayer>().block()
-}
-
-inline fun <
-    reified TChildLayer,
-> LayerWithChildren<TChildLayer>.withChildLayer(
-    noinline block: suspend TChildLayer.() -> Unit,
-) where
-    TChildLayer : ApplicationLayer<TChildLayer>
-= (this as ApplicationLayer<*>).coroutineScope.launch { // this cast will always succeed
-    getChildLayer<TChildLayer>().block()
-}
-
-/**
- * The root layer in the application layer stack
- *
- * @property depth The depth of this layer in the tree. Defaults to [ApplicationLayer.ROOT_DEPTH]
- */
-abstract class RootLayer<TRootLayer : RootLayer<TRootLayer>>(
-    override val coroutineScope: CoroutineScope,
-) : ApplicationLayer<RootLayer<TRootLayer>> {
-    override val depth: Int = ApplicationLayer.ROOT_DEPTH
-
-    @Suppress("LeakingThis")
-    override val services = ServiceContainer(this)
-    override val resourceProviders = mutableMapOf<String, ResourceProvider<*>>()
-
-    abstract suspend fun start()
-}

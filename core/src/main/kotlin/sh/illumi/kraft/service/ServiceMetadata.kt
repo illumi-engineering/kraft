@@ -1,7 +1,7 @@
 package sh.illumi.kraft.service
 
-import sh.illumi.kraft.ApplicationLayer
 import sh.illumi.kraft.KraftException
+import sh.illumi.kraft.layer.ApplicationLayer
 import kotlin.reflect.KClass
 
 /**
