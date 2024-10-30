@@ -1,6 +1,6 @@
 plugins {
-    kotlin("jvm") version "2.0.0"
-    id("org.jetbrains.dokka") version "1.9.20"
+    kotlin("jvm")
+    id("org.jetbrains.dokka")
     `maven-publish`
 }
 
@@ -8,7 +8,6 @@ group = rootProject.group
 version = rootProject.version
 
 dependencies {
-    implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.slf4j)
@@ -42,7 +41,9 @@ publishing {
     }
 
     publications {
-        create<MavenPublication>("kraftLib") {
+        create<MavenPublication>("kraftCore") {
+            artifactId = "kraft-core"
+
             from(components["java"])
 
             artifact(sourcesJar.get())
