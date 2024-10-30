@@ -34,7 +34,7 @@ interface ApplicationLayer<TLayer : ApplicationLayer<TLayer>> {
     val handle: Int // todo: come up with a better system for identifying layers
 
     val resourceProviders: MutableMap<String, ResourceProvider<*>>
-    val services: ServiceContainer
+    val services: ServiceContainer<TLayer>
 
     /**
      * Get the class for a given [index] in the layer tree
