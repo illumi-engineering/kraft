@@ -1,6 +1,6 @@
-package sh.illumi.oss.lib.kraft.resource
+package sh.illumi.kraft.resource
 
-import sh.illumi.oss.lib.kraft.ApplicationLayer
+import sh.illumi.kraft.ApplicationLayer
 import java.util.ServiceLoader
 
 class ResourceProviderFactory(val applicationLayer: ApplicationLayer<*>) {

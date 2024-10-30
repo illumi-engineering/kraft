@@ -1,7 +1,9 @@
-package sh.illumi.oss.lib.kraft.service
+package sh.illumi.kraft.service
 
 import kotlinx.coroutines.CoroutineScope
-import sh.illumi.oss.lib.kraft.*
+import sh.illumi.kraft.ApplicationLayer
+import sh.illumi.kraft.ServiceContainerException
+import sh.illumi.kraft.*
 import kotlin.reflect.KFunction
 
 class ServiceContainer(

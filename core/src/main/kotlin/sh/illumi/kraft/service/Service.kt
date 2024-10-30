@@ -1,4 +1,4 @@
-package sh.illumi.oss.lib.kraft.service
+package sh.illumi.kraft.service
 
 import kotlinx.coroutines.CoroutineScope
 import org.slf4j.Logger

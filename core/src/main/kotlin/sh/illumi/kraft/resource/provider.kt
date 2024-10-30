@@ -1,4 +1,4 @@
-package sh.illumi.oss.lib.kraft.resource
+package sh.illumi.kraft.resource
 
 
 interface ResourceProvider<TResource : Resource<TResource, ResourceProvider<TResource>>>

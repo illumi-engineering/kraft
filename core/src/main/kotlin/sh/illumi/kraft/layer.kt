@@ -1,13 +1,13 @@
-package sh.illumi.oss.lib.kraft
+package sh.illumi.kraft
 
 import kotlinx.coroutines.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import sh.illumi.oss.lib.kraft.resource.ResourceProvider
-import sh.illumi.oss.lib.kraft.service.Service
+import sh.illumi.kraft.resource.ResourceProvider
+import sh.illumi.kraft.service.Service
 import kotlin.reflect.KClass
 
-import sh.illumi.oss.lib.kraft.service.ServiceContainer
+import sh.illumi.kraft.service.ServiceContainer
 
 /**
  * Each layer in an application represents a different scope of services,

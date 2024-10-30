@@ -1,9 +1,6 @@
-package sh.illumi.oss.lib.kraft
+package sh.illumi.kraft
 
-import kotlin.reflect.KClass
-
-import sh.illumi.oss.lib.kraft.service.Service
-import sh.illumi.oss.lib.kraft.service.ServiceContainer
+import sh.illumi.kraft.service.ServiceContainer
 
 /**
  * Base exception for Kraft exceptions

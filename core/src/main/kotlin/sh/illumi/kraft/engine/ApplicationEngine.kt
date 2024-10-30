@@ -1,9 +1,9 @@
-package sh.illumi.oss.lib.kraft.engine
+package sh.illumi.kraft.engine
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
-import sh.illumi.oss.lib.kraft.KraftException
-import sh.illumi.oss.lib.kraft.RootLayer
+import sh.illumi.kraft.KraftException
+import sh.illumi.kraft.RootLayer
 
 /**
  * An ApplicationEngine is the entry point for a Kraft application. It is

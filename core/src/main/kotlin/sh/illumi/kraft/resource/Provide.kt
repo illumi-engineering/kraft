@@ -1,4 +1,4 @@
-package sh.illumi.oss.lib.kraft.resource
+package sh.illumi.kraft.resource
 
 /**
  * Annotation for providing resources to the application.
