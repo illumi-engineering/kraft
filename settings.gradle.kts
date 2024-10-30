@@ -5,3 +5,5 @@ plugins {
 rootProject.name = "kraft"
 
 include("core")
+
+include("kraftx:http")

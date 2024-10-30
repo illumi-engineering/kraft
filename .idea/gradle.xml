@@ -10,6 +10,8 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/kraftx" />
+            <option value="$PROJECT_DIR$/kraftx/http" />
           </set>
         </option>
       </GradleProjectSettings>
