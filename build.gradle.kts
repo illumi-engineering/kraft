@@ -1,5 +1,3 @@
-import org.jetbrains.dokka.gradle.DokkaPlugin
-
 plugins {
     kotlin("jvm") version "2.0.0"
     id("org.jetbrains.dokka") version "1.9.20"
@@ -11,6 +9,7 @@ version = "0.0.1"
 
 allprojects {
     repositories {
+        mavenLocal()
         mavenCentral()
     }
 

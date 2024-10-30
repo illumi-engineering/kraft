@@ -7,5 +7,10 @@ enum class HttpMethod(val protocolValue: String) {
     PATCH("PATCH"),
     DELETE("DELETE"),
     OPTIONS("OPTIONS"),
-    HEAD("HEAD"),
+    HEAD("HEAD");
+
+    companion object {
+        fun getFromProtocolValue(protocolValue: String) =
+            entries.first { it.protocolValue == protocolValue }
+    }
 }

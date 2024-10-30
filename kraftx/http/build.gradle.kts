@@ -17,6 +17,7 @@ dependencies {
     implementation(libs.slf4j.api)
 
     implementation("io.netty:netty-all:4.1.114.Final") // todo: add to version catalog
+    implementation("com.oxyggen.net:urilib:1.0.11") // todo: add to version catalog
 
     testImplementation(kotlin("test"))
     testImplementation(libs.kotlinx.coroutines.test)

@@ -1,14 +1,15 @@
 package sh.illumi.kraft.x.http.routing
 
+import com.oxyggen.io.Path
 import sh.illumi.kraft.x.http.HttpMethod
 
 open class Route(
-    val path: String = "/",
+    val path: Path = Path.parse("/"),
     val childRoutes: MutableList<Route> = mutableListOf(),
     val handlers: MutableMap<HttpMethod, suspend () -> Unit> = mutableMapOf()
 ) {
-    fun route(path: String, handler: suspend () -> Unit) {
-        val route = Route(path, mutableListOf())
+    fun route(routePath: String, handler: suspend () -> Unit) {
+        val route = Route(path.resolve(routePath), mutableListOf())
         for (httpMethod in HttpMethod.entries) route.handlers[httpMethod] = handler
         childRoutes += route
     }
@@ -41,44 +42,44 @@ open class Route(
         handlers[HttpMethod.HEAD] = handler
     }
 
-    fun get(path: String, handler: suspend () -> Unit) {
-        val route = Route(path, mutableListOf())
+    fun get(routePath: String, handler: suspend () -> Unit) {
+        val route = Route(path.resolve(routePath), mutableListOf())
         route.handlers[HttpMethod.GET] = handler
         childRoutes += route
     }
 
-    fun post(path: String, handler: suspend () -> Unit) {
-        val route = Route(path, mutableListOf())
+    fun post(routePath: String, handler: suspend () -> Unit) {
+        val route = Route(path.resolve(routePath), mutableListOf())
         route.handlers[HttpMethod.POST] = handler
         childRoutes += route
     }
 
-    fun put(path: String, handler: suspend () -> Unit) {
-        val route = Route(path, mutableListOf())
+    fun put(routePath: String, handler: suspend () -> Unit) {
+        val route = Route(path.resolve(routePath), mutableListOf())
         route.handlers[HttpMethod.PUT] = handler
         childRoutes += route
     }
 
-    fun patch(path: String, handler: suspend () -> Unit) {
-        val route = Route(path, mutableListOf())
+    fun patch(routePath: String, handler: suspend () -> Unit) {
+        val route = Route(path.resolve(routePath), mutableListOf())
         route.handlers[HttpMethod.PATCH] = handler
         childRoutes += route
     }
 
-    fun delete(path: String, handler: suspend () -> Unit) {
-        val route = Route(path, mutableListOf())
+    fun delete(routePath: String, handler: suspend () -> Unit) {
+        val route = Route(path.resolve(routePath), mutableListOf())
         route.handlers[HttpMethod.DELETE] = handler
         childRoutes += route
     }
 
-    fun options(path: String, handler: suspend () -> Unit) {
-        val route = Route(path, mutableListOf())
+    fun options(routePath: String, handler: suspend () -> Unit) {
+        val route = Route(path.resolve(routePath), mutableListOf())
         route.handlers[HttpMethod.OPTIONS] = handler
         childRoutes += route
     }
 
-    fun head(path: String, handler: suspend () -> Unit) {
-        val route = Route(path, mutableListOf())
+    fun head(routePath: String, handler: suspend () -> Unit) {
+        val route = Route(path.resolve(routePath), mutableListOf())
         route.handlers[HttpMethod.HEAD] = handler
         childRoutes += route
     }
