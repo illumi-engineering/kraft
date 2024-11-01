@@ -13,6 +13,6 @@ abstract class Call(
     val queryParams by uri.queryParam
 
     suspend fun handle() {
-        route.handlers[method]?.invoke(route)
+        route.handlers[method]?.invoke(this)
     }
 }
