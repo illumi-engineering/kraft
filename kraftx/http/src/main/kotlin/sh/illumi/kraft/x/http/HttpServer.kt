@@ -11,6 +11,7 @@ import io.netty.handler.logging.LoggingHandler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import sh.illumi.kraft.layer.RootLayer
+import sh.illumi.kraft.x.http.call.Call
 import sh.illumi.kraft.x.http.routing.Route
 
 /**
@@ -36,6 +37,10 @@ class HttpServer(
 //                p.addLast(new CustomHttpServerHandler());
             }
         });
+
+    fun route(routePath: String, block: Call.() -> Unit) {
+        rootRoute.route(routePath, block)
+    }
 
     fun startServer() {
         serverJob = layer.coroutineScope.launch {
