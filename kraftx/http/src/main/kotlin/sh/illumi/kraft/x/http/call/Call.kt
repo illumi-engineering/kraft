@@ -9,7 +9,11 @@ abstract class Call(
     val method: HttpMethod,
     val route: Route
 ) {
-    val pathParams: Map<String, String> = TODO()
+    val pathParams: Map<String, String> = route.path.parts.zip(uri.path.parts).mapNotNull { (routePart, uriPart) ->
+        if (routePart.startsWith("{") && routePart.endsWith("}")) {
+            routePart.substring(1, routePart.length - 1) to uriPart
+        } else null
+    }.toMap()
     val queryParams by uri.queryParam
 
     suspend fun handle() {
