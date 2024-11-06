@@ -16,8 +16,8 @@ dependencies {
 
     implementation(libs.slf4j.api)
 
-    implementation("io.netty:netty-all:4.1.114.Final") // todo: add to version catalog
-    implementation("com.oxyggen.net:urilib:1.0.11") // todo: add to version catalog
+    implementation(libs.netty.all)
+    implementation(libs.urilib)
 
     testImplementation(kotlin("test"))
     testImplementation(libs.kotlinx.coroutines.test)
@@ -43,6 +43,22 @@ val dokkaJavadocJar by tasks.registering(Jar::class) {
 publishing {
     repositories {
         mavenLocal()
+        maven {
+            name = "frottingServicesSnapshots"
+            url = uri("https://maven.frotting.services/snapshots")
+            credentials(PasswordCredentials::class)
+            authentication {
+                create<BasicAuthentication>("basic")
+            }
+        }
+        maven {
+            name = "frottingServicesReleases"
+            url = uri("https://maven.frotting.services/releases")
+            credentials(PasswordCredentials::class)
+            authentication {
+                create<BasicAuthentication>("basic")
+            }
+        }
     }
 
     publications {

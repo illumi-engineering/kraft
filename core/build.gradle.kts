@@ -38,6 +38,24 @@ val dokkaJavadocJar by tasks.registering(Jar::class) {
 publishing {
     repositories {
         mavenLocal()
+
+        maven {
+            name = "frottingServicesSnapshots"
+            url = uri("https://maven.frotting.services/snapshots")
+            credentials(PasswordCredentials::class)
+            authentication {
+                create<BasicAuthentication>("basic")
+            }
+        }
+
+        maven {
+            name = "frottingServicesReleases"
+            url = uri("https://maven.frotting.services/releases")
+            credentials(PasswordCredentials::class)
+            authentication {
+                create<BasicAuthentication>("basic")
+            }
+        }
     }
 
     publications {

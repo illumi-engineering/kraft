@@ -9,7 +9,11 @@ version = "0.0.1"
 
 allprojects {
     repositories {
-        mavenLocal()
+        maven {
+            name = "frotting-services"
+            url = uri("https://maven.frotting.services/releases")
+        }
+
         mavenCentral()
     }
 
