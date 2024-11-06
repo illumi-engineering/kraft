@@ -16,8 +16,7 @@ dependencies {
 
     implementation(libs.slf4j.api)
 
-    implementation(libs.netty.all)
-    implementation(libs.urilib)
+    implementation(libs.ktor.server.core)
 
     testImplementation(kotlin("test"))
     testImplementation(libs.kotlinx.coroutines.test)

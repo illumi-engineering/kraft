@@ -16,5 +16,14 @@ abstract class RootLayer(
     @Suppress("LeakingThis")
     override val services = ServiceContainer(this)
 
+    init {
+        @Suppress("LeakingThis")
+        instance = this
+    }
+
     abstract suspend fun start()
+
+    companion object {
+        lateinit var instance: RootLayer
+    }
 }
