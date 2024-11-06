@@ -63,7 +63,7 @@ publishing {
     }
 
     publications {
-        create<MavenPublication>("kraftxHttp") {
+        create<MavenPublication>("kraftxExposed") {
             artifactId = "kraftx-exposed"
 
             from(components["java"])
