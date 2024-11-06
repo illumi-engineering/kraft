@@ -7,3 +7,4 @@ rootProject.name = "kraft"
 include("core")
 
 include("kraftx:http")
+include("kraftx:exposed")

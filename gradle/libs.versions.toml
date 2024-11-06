@@ -3,6 +3,8 @@ kotlinx-coroutines = "1.9.0"
 slf4j = "2.0.16"
 urilib = "1.0.12"
 netty = "4.1.114.Final"
+exposed = "0.56.0"
+hikari = "6.0.0"
 
 [libraries]
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
@@ -14,3 +16,8 @@ slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 netty-all = { module = "io.netty:netty-all", version.ref = "netty" }
 
 urilib = { module = "com.oxyggen.net:urilib", version.ref = "urilib" }
+
+exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
+exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
+
+hikari = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
