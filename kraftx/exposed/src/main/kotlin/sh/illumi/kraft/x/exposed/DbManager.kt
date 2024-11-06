@@ -3,6 +3,8 @@ package sh.illumi.kraft.x.exposed
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.Transaction
+import org.jetbrains.exposed.sql.transactions.transaction
 import sh.illumi.kraft.layer.RootLayer
 import sh.illumi.kraft.x.exposed.dsl.ExposedConfigurationDsl
 
@@ -62,4 +64,6 @@ sealed interface DbManager {
             Database.connect(jdbcUrl, driverClassName, username, password)
         }
     }
+
+    fun <T> transaction(block: Transaction.() -> T) = transaction(db, block)
 }
