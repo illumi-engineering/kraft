@@ -2,6 +2,10 @@ package sh.illumi.kraft.x.exposed
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -13,15 +17,20 @@ sealed interface DbManager {
     val isPooled: Boolean
     val layer: RootLayer
 
+    var transactionContext: CoroutineDispatcher
+
     class Hikari(
         override val layer: RootLayer,
         configure: ExposedConfigurationDsl.Hikari.() -> Unit
     ) : DbManager {
+        override var transactionContext: CoroutineDispatcher
         private val dataSource: HikariDataSource
 
         init {
             val dsl = ExposedConfigurationDsl.Hikari().apply(configure)
             dsl.check()
+
+            transactionContext = Dispatchers.IO.limitedParallelism(dsl.transactionParallelism)
 
             dataSource = HikariDataSource(HikariConfig().apply {
                 jdbcUrl = dsl.jdbcUrl
@@ -44,6 +53,7 @@ sealed interface DbManager {
         override val layer: RootLayer,
         configure: ExposedConfigurationDsl.() -> Unit
     ) : DbManager {
+        override var transactionContext: CoroutineDispatcher
         private val jdbcUrl: String
         private val driverClassName: String
         private val username: String
@@ -52,6 +62,8 @@ sealed interface DbManager {
         init {
             val dsl = ExposedConfigurationDsl().apply(configure)
             dsl.check()
+
+            transactionContext = Dispatchers.IO.limitedParallelism(dsl.transactionParallelism)
 
             jdbcUrl = dsl.jdbcUrl
             driverClassName = dsl.driverClassName
@@ -65,5 +77,7 @@ sealed interface DbManager {
         }
     }
 
-    fun <T> transaction(block: Transaction.() -> T) = transaction(db, block)
+    fun <T> transaction(block: Transaction.() -> T) = layer.coroutineScope.async {
+        withContext(transactionContext) { transaction(db, block) }
+    }
 }

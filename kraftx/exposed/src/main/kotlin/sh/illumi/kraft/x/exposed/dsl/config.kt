@@ -5,12 +5,14 @@ open class ExposedConfigurationDsl {
     var driverClassName: String = ""
     var username: String = ""
     var password: String = ""
+    var transactionParallelism = 10
 
     open fun check() {
         require(jdbcUrl.isNotBlank()) { "jdbcUrl must be set" }
         require(driverClassName.isNotBlank()) { "driverClassName must be set" }
         require(username.isNotBlank()) { "username must be set" }
         require(password.isNotBlank()) { "password must be set" }
+        require(transactionParallelism > 0) { "transactionParallelism must be greater than 0" }
     }
 
     class Hikari : ExposedConfigurationDsl() {
