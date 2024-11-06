@@ -19,7 +19,7 @@ import sh.illumi.kraft.x.http.routing.Route
  * the application.
  */
 class HttpServer(
-    private val layer: RootLayer<*>,
+    private val layer: RootLayer,
 ) {
     private lateinit var serverJob: Job
     val rootRoute = Route()

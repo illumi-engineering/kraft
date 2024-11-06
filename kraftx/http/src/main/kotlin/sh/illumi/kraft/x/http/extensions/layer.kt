@@ -7,8 +7,8 @@ import sh.illumi.kraft.service.Service
 import sh.illumi.kraft.x.http.HttpServer
 import sh.illumi.kraft.x.http.routing.Route
 
-val RootLayer<*>.httpServer: HttpServer by lazyProperty {
-    HttpServer(this as RootLayer<*>) // i am going to kill myself!!!!
+val RootLayer.httpServer: HttpServer by lazyProperty {
+    HttpServer(this)
 }
 
 fun Service.httpRouting(block: Route.() -> Unit) {

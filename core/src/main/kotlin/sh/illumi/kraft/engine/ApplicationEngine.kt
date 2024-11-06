@@ -15,14 +15,14 @@ import sh.illumi.kraft.layer.RootLayer
  * created by extending this class.
  */
 abstract class ApplicationEngine {
-    lateinit var rootLayer: RootLayer<*> private set
+    lateinit var rootLayer: RootLayer private set
 
-    fun <TRootLayer : RootLayer<TRootLayer>> startRoot(createRoot: suspend CoroutineScope.() -> TRootLayer) = runBlocking {
+    fun <TRootLayer : RootLayer> startRoot(createRoot: suspend CoroutineScope.() -> TRootLayer) = runBlocking {
         rootLayer = createRoot()
         rootLayer.start()
     }
 
-    inline fun <reified TRootLayer : RootLayer<TRootLayer>> startRoot() = startRoot {
+    inline fun <reified TRootLayer : RootLayer> startRoot() = startRoot {
         TRootLayer::class.constructors.firstOrNull {
             it.parameters.size == 1 && it.parameters[0].type.classifier == CoroutineScope::class
         }?.call(this) ?: throw KraftException("Root layer has no suitable constructor")

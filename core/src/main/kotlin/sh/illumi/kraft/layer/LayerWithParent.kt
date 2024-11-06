@@ -6,6 +6,6 @@ package sh.illumi.kraft.layer
  * @param TParentLayer The type of the parent layer
  * @property parentLayer The parent layer
  */
-interface LayerWithParent<TParentLayer : ApplicationLayer<TParentLayer>> {
+interface LayerWithParent<TParentLayer : ApplicationLayer> {
     val parentLayer: TParentLayer
 }

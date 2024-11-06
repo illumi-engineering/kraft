@@ -27,9 +27,9 @@ annotation class ServiceMetadata(
          *
          * @return The resolved annotation
          */
-        fun <TLayer : ApplicationLayer<TLayer>> resolveAnnotation(
+        fun resolveAnnotation(
             serviceClass: KClass<out Service>,
-            serviceContainer: ServiceContainer<TLayer>
+            serviceContainer: ServiceContainer,
         ) = serviceClass.annotations.first {
                 it is ServiceMetadata && it.layers.contains(serviceContainer.applicationLayer.handle)
             } as? ServiceMetadata ?: throw KraftException("Service ${serviceClass.simpleName} has no suitable ServiceMetadata annotation")

@@ -4,7 +4,6 @@ import kotlinx.coroutines.CoroutineScope
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import sh.illumi.kraft.KraftException
-import sh.illumi.kraft.resource.ResourceProvider
 import sh.illumi.kraft.service.Service
 import sh.illumi.kraft.service.ServiceContainer
 import kotlin.reflect.KClass
@@ -20,21 +19,18 @@ import kotlin.reflect.KClass
  *
  * todo: provide an example here
  *
- * @param TLayer The type of the layer
- *
  * @property coroutineScope The coroutine scope for the layer
  * @property depth The depth of the layer in the layer tree
  * @property handle An identifying handle for the layer
- * @property resourceProviders The resource providers for the layer
  * @property services The services for the layer
  */
-interface ApplicationLayer<TLayer : ApplicationLayer<TLayer>> {
+interface ApplicationLayer {
     val coroutineScope: CoroutineScope
     val depth: Int
     val handle: Int // todo: come up with a better system for identifying layers
+    val isRoot: Boolean get() = depth == ROOT_DEPTH
 
-    val resourceProviders: MutableMap<String, ResourceProvider<*>>
-    val services: ServiceContainer<TLayer>
+    val services: ServiceContainer
 
     /**
      * Get the class for a given [index] in the layer tree
@@ -43,7 +39,7 @@ interface ApplicationLayer<TLayer : ApplicationLayer<TLayer>> {
      * @return The class of the layer at the given index
      * @throws KraftException If the layer has no parent, and we are not at the root layer.
      */
-    fun getClassForIndex(index: Int): KClass<out ApplicationLayer<*>> {
+    fun getClassForIndex(index: Int): KClass<out ApplicationLayer> {
         val layers = getLayersToRoot().reversed()
 //        println(layers.map { it.javaClass.kotlin.simpleName })
         return layers[index].javaClass.kotlin
@@ -57,14 +53,15 @@ interface ApplicationLayer<TLayer : ApplicationLayer<TLayer>> {
      *
      * @see LayerWithParent
      */
-    fun getLayersToRoot(): List<ApplicationLayer<*>> {
-        val layers = mutableListOf<ApplicationLayer<*>>()
-        var currentLayer: ApplicationLayer<*> = this
+    fun getLayersToRoot(): List<ApplicationLayer> {
+        val layers = mutableListOf<ApplicationLayer>()
+        var currentLayer: ApplicationLayer = this
 
-        while (currentLayer is LayerWithParent<*> || currentLayer is RootLayer<*>) {
+        while (currentLayer is LayerWithParent<*> || currentLayer.isRoot) {
             layers += currentLayer
 
-            if (currentLayer is LayerWithParent<*>) currentLayer = currentLayer.parentLayer
+            if (currentLayer is LayerWithParent<*> && !currentLayer.isRoot)
+                currentLayer = currentLayer.parentLayer
             else break
         }
 
@@ -125,11 +122,11 @@ interface ApplicationLayer<TLayer : ApplicationLayer<TLayer>> {
  *
  * @see LayerWithParent
  */
-inline fun <TLayer : ApplicationLayer<TLayer>, reified TTargetLayer : ApplicationLayer<*>> ApplicationLayer<TLayer>.getLayersToTyped(): List<ApplicationLayer<*>> {
-    val layers = mutableListOf<ApplicationLayer<*>>()
-    var currentLayer: ApplicationLayer<*> = this
+inline fun <reified TTargetLayer : ApplicationLayer> ApplicationLayer.getLayersToTyped(): List<ApplicationLayer> {
+    val layers = mutableListOf<ApplicationLayer>()
+    var currentLayer: ApplicationLayer = this
 
-    while (currentLayer !is TTargetLayer && (currentLayer is LayerWithParent<*> || currentLayer is RootLayer<*>)) {
+    while (currentLayer !is TTargetLayer && (currentLayer is LayerWithParent<*> || currentLayer.isRoot)) {
         layers += currentLayer
 
         if (currentLayer is LayerWithParent<*>) currentLayer = currentLayer.parentLayer
@@ -143,4 +140,4 @@ inline fun <TLayer : ApplicationLayer<TLayer>, reified TTargetLayer : Applicatio
     return layers
 }
 
-inline fun <TLayer : ApplicationLayer<TLayer>, reified TService : Service> ApplicationLayer<TLayer>.service() = services.get<TService>()
+inline fun <reified TService : Service> ApplicationLayer.service() = services.get<TService>()

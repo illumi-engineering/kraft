@@ -7,11 +7,10 @@ import sh.illumi.kraft.KraftException
 /**
  * A service layer with children
  *
- * @param TChildLayer The type of the child layer
  * @property childLayers The background child layers
  */
-interface LayerWithChildren<TChildLayer : ApplicationLayer<TChildLayer>> {
-    val childLayers: MutableList<ApplicationLayer<*>>
+interface LayerWithChildren {
+    val childLayers: MutableList<ApplicationLayer>
 }
 
 /**
@@ -24,8 +23,8 @@ interface LayerWithChildren<TChildLayer : ApplicationLayer<TChildLayer>> {
  * todo: better exception
  */
 inline fun <
-    reified TChildLayer : ApplicationLayer<TChildLayer>,
-> LayerWithChildren<TChildLayer>.getChildLayer() = childLayers
+    reified TChildLayer : ApplicationLayer
+> LayerWithChildren.getChildLayer() = childLayers
     .filterIsInstance<TChildLayer>()
     .firstOrNull() ?: throw KraftException("No child layer of type ${TChildLayer::class.simpleName} found")
 
@@ -40,20 +39,15 @@ inline fun <
  *
  * @throws KraftException If no child layer of the specified type is found
  */
-inline fun <
-    reified TChildLayer,
-    TReturn : Any,
-> LayerWithChildren<TChildLayer>.withChildLayerReturning(
+inline fun <reified TChildLayer, TReturn> LayerWithChildren.withChildLayerReturning(
     noinline block: suspend TChildLayer.() -> TReturn,
-) where TChildLayer : ApplicationLayer<TChildLayer> = getChildLayer<TChildLayer>().let { child ->
+) where TChildLayer : ApplicationLayer = getChildLayer<TChildLayer>().let { child ->
     child.coroutineScope.async { child.block() }
 }
 
 
-inline fun <
-        reified TChildLayer,
-        > LayerWithChildren<TChildLayer>.withChildLayer(
+inline fun <reified TChildLayer> LayerWithChildren.withChildLayer(
     noinline block: suspend TChildLayer.() -> Unit,
-) where TChildLayer : ApplicationLayer<TChildLayer> = getChildLayer<TChildLayer>().let { child ->
+) where TChildLayer : ApplicationLayer = getChildLayer<TChildLayer>().let { child ->
     child.coroutineScope.launch { child.block() }
 }

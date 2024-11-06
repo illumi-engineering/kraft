@@ -7,11 +7,9 @@ import sh.illumi.kraft.layer.ApplicationLayer
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty
 
-class ServiceContainer<TLayer>(
-    val applicationLayer: TLayer
-) where
-    TLayer : ApplicationLayer<TLayer>
-{
+class ServiceContainer(
+    val applicationLayer: ApplicationLayer
+) {
     private val services = mutableMapOf<String, Service>()
 
     /**
@@ -101,5 +99,5 @@ class ServiceContainer<TLayer>(
         services[annotation.key] = service
     }
 
-    inline operator fun <reified TService : Service> getValue(thisRef: TLayer?, prop: KProperty<*>): TService = get()
+    inline operator fun <reified TService : Service> getValue(thisRef: ApplicationLayer, prop: KProperty<*>): TService = get()
 }
