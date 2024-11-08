@@ -20,17 +20,12 @@ import kotlin.reflect.KClass
  * todo: provide an example here
  *
  * @property coroutineScope The coroutine scope for the layer
- * @property depth The depth of the layer in the layer tree
- * @property handle An identifying handle for the layer
  * @property services The services for the layer
  */
 interface ApplicationLayer {
     val coroutineScope: CoroutineScope
-    val depth: Int
-    val handle: Int // todo: come up with a better system for identifying layers
-    val isRoot: Boolean get() = depth == ROOT_DEPTH
-
-    val services: ServiceContainer
+    val isRoot: Boolean get() = this is RootLayer
+    val services: ServiceContainer get() = ServiceContainer(this)
 
     /**
      * Get the class for a given [index] in the layer tree
@@ -41,7 +36,6 @@ interface ApplicationLayer {
      */
     fun getClassForIndex(index: Int): KClass<out ApplicationLayer> {
         val layers = getLayersToRoot().reversed()
-//        println(layers.map { it.javaClass.kotlin.simpleName })
         return layers[index].javaClass.kotlin
     }
 
@@ -68,51 +62,11 @@ interface ApplicationLayer {
         return layers
     }
 
-    val log: Logger get() = LoggerFactory.getLogger(this::class.java)
-
-    companion object {
-        /**
-         * The depth of the root layer
-         */
-        const val ROOT_DEPTH = 0
-
-        /**
-         * The handle for the root layer
-         */
-        const val ROOT_HANDLE = 0
-
-        /**
-         * The maximum depth of a layer
-         * todo: allow this to be set by the caller so that it can be adjusted based on the application's needs
-         */
-        private const val MAX_DEPTH = 16 // a depth of 16 layers should be more than enough for any practical use case
-
-        /**
-         * The maximum number of handles, and consequently layers that may be created
-         * todo: allow this to be set by the caller so that it can be adjusted based on the application's needs
-         */
-        private const val MAX_HANDLES: Int = Int.MAX_VALUE
-
-        private var nextHandle: Int = ROOT_HANDLE + 1
-
-        /**
-         * Get the next handle for a layer
-         *
-         * @return The next handle in the auto-incrementing sequence
-         *
-         * @throws KraftException If the number of handles exceeds [MAX_HANDLES]
-         */
-        fun nextHandle(): Int {
-            if (nextHandle - 1 == MAX_HANDLES) {
-                throw KraftException("ApplicationLayer handles exhausted")
-            }
-
-            val handle = nextHandle
-            nextHandle++
-
-            return handle
-        }
+    fun start() {
+        services.each { it.onStart() }
     }
+
+    val log: Logger get() = LoggerFactory.getLogger(this::class.java)
 }
 
 /**
@@ -134,7 +88,7 @@ inline fun <reified TTargetLayer : ApplicationLayer> ApplicationLayer.getLayersT
     }
 
     if (currentLayer !is TTargetLayer) {
-        throw KraftException("${this.javaClass.kotlin.simpleName}[handle=$handle,depth=$depth] has no parent of type ${TTargetLayer::class.simpleName}")
+        throw KraftException("${this.javaClass.kotlin.simpleName} has no parent of type ${TTargetLayer::class.simpleName}")
     }
 
     return layers

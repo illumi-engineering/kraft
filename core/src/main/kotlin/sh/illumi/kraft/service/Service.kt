@@ -15,4 +15,7 @@ interface Service {
     val coroutineScope: CoroutineScope
     val rootLayer: RootLayer
     val log: Logger get() = LoggerFactory.getLogger(this::class.java)
+
+    fun onStart() {}
+    fun onShutdown() {}
 }

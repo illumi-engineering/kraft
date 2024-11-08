@@ -100,4 +100,8 @@ class ServiceContainer(
     }
 
     inline operator fun <reified TService : Service> getValue(thisRef: ApplicationLayer, prop: KProperty<*>): TService = get()
+
+    fun each(block: (Service) -> Unit) {
+        services.values.forEach(block)
+    }
 }
