@@ -26,6 +26,7 @@ interface ApplicationLayer {
     val coroutineScope: CoroutineScope
     val isRoot: Boolean get() = this is RootLayer
     val services: ServiceContainer get() = ServiceContainer(this)
+    val depth get() = getLayersToRoot().size - 1 // root layer has depth 0
 
     /**
      * Get the class for a given [index] in the layer tree
