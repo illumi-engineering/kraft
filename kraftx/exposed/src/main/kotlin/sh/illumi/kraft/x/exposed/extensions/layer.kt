@@ -2,18 +2,19 @@ package sh.illumi.kraft.x.exposed.extensions
 
 import sh.illumi.kraft.layer.RootLayer
 import sh.illumi.kraft.x.exposed.DbManager
-import sh.illumi.kraft.x.exposed.dsl.ExposedConfigurationDsl
+import sh.illumi.kraft.x.exposed.DbManagerFactory
+import sh.illumi.kraft.x.exposed.dsl.ExposedDbManagerConfigDsl
 import sh.illumi.kraft.x.exposed.layer.LayerWithExposed
 
-fun <TLayer> TLayer.createExposedHikari(configure: ExposedConfigurationDsl.Hikari.() -> Unit)
+// todo: Document this
+// todo: Test this
+inline fun <TLayer, reified TDbConfig, reified TDbManager> TLayer.createExposed(
+    factory: DbManagerFactory<TDbConfig, TDbManager>,
+    noinline configure: TDbConfig.() -> Unit
+): TDbManager
 where
     TLayer : RootLayer,
-    TLayer : LayerWithExposed
-= DbManager.Hikari(this, configure)
-
-
-fun <TLayer> TLayer.createExposedSingle(configure: ExposedConfigurationDsl.() -> Unit)
-where
-    TLayer : RootLayer,
-    TLayer : LayerWithExposed
-= DbManager.Single(this, configure)
+    TLayer : LayerWithExposed,
+    TDbConfig : ExposedDbManagerConfigDsl,
+    TDbManager : DbManager<TDbConfig>
+= factory.create(this, configure)
