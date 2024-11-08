@@ -3,6 +3,7 @@ package sh.illumi.kraft.service
 import sh.illumi.kraft.KraftException
 import sh.illumi.kraft.layer.ApplicationLayer
 import kotlin.reflect.KClass
+import kotlin.reflect.full.allSuperclasses
 
 /**
  * Metadata annotation for services
@@ -30,8 +31,12 @@ annotation class ServiceMetadata(
         fun resolveAnnotation(
             serviceClass: KClass<out Service>,
             serviceContainer: ServiceContainer,
-        ) = serviceClass.annotations.first {
-                it is ServiceMetadata && it.layers.contains(serviceContainer.applicationLayer.javaClass.kotlin)
-            } as? ServiceMetadata ?: throw KraftException("Service ${serviceClass.simpleName} has no suitable ServiceMetadata annotation")
+        ) = serviceClass.annotations.filterIsInstance<ServiceMetadata>().first { annotation ->
+
+            val layerClass = annotation.layers[serviceContainer.applicationLayer.depth]
+
+            return@first layerClass == serviceContainer.applicationLayer.javaClass.kotlin ||
+                    serviceContainer.applicationLayer.javaClass.kotlin.allSuperclasses.contains(layerClass)
+        } as? ServiceMetadata ?: throw KraftException("Service ${serviceClass.simpleName} has no suitable ServiceMetadata annotation")
     }
 }

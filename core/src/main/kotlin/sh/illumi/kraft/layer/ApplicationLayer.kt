@@ -67,6 +67,10 @@ interface ApplicationLayer {
         services.each { it.onStart() }
     }
 
+    fun shutdown() {
+        services.each { it.onShutdown() }
+    }
+
     val log: Logger get() = LoggerFactory.getLogger(this::class.java)
 }
 
