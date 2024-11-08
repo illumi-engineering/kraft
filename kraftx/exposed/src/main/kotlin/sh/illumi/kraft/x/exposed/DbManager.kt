@@ -13,7 +13,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import sh.illumi.kraft.layer.RootLayer
 import sh.illumi.kraft.x.exposed.dsl.ExposedConfigurationDsl
 
-sealed interface DbManager {
+interface DbManager {
     val db: Database
     val isPooled: Boolean
     val layer: RootLayer
