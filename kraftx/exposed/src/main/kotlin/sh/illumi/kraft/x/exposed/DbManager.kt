@@ -8,6 +8,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.Transaction
+import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
 import sh.illumi.kraft.layer.RootLayer
 import sh.illumi.kraft.x.exposed.dsl.ExposedConfigurationDsl
@@ -80,4 +81,11 @@ sealed interface DbManager {
     fun <T> transaction(block: Transaction.() -> T) = layer.coroutineScope.async {
         withContext(transactionContext) { transaction(db, block) }
     }
+
+    suspend fun <T> suspendTransaction(block: suspend Transaction.() -> T) =
+        newSuspendedTransaction(
+            context = transactionContext,
+            db = db,
+            statement = block
+        )
 }
