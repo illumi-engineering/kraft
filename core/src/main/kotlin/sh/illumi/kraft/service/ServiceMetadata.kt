@@ -8,15 +8,15 @@ import kotlin.reflect.KClass
  * Metadata annotation for services
  *
  * @param key The key to use for identifying the service
+ * @param layers The layers that this service is available in
  * @param dependencies The services that this service depends on
- * @param layers The scopes that this service is available in
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class ServiceMetadata(
     val key: String,
+    val layers: Array<KClass<out ApplicationLayer>>,
     val dependencies: Array<KClass<out Service>> = [],
-    val layers: IntArray = [ApplicationLayer.ROOT_HANDLE],
 ) {
     companion object {
         /**
@@ -31,7 +31,7 @@ annotation class ServiceMetadata(
             serviceClass: KClass<out Service>,
             serviceContainer: ServiceContainer,
         ) = serviceClass.annotations.first {
-                it is ServiceMetadata && it.layers.contains(serviceContainer.applicationLayer.handle)
+                it is ServiceMetadata && it.layers.contains(serviceContainer.applicationLayer.javaClass.kotlin)
             } as? ServiceMetadata ?: throw KraftException("Service ${serviceClass.simpleName} has no suitable ServiceMetadata annotation")
     }
 }
