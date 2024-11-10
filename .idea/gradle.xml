@@ -12,7 +12,7 @@
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/kraftx" />
             <option value="$PROJECT_DIR$/kraftx/exposed" />
-            <option value="$PROJECT_DIR$/kraftx/http" />
+            <option value="$PROJECT_DIR$/kraftx/ktor" />
           </set>
         </option>
       </GradleProjectSettings>

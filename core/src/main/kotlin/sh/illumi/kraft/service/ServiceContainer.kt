@@ -99,7 +99,7 @@ class ServiceContainer(
         services[annotation.key] = service
     }
 
-    inline operator fun <reified TService : Service> getValue(thisRef: ApplicationLayer, prop: KProperty<*>): TService = get()
+    inline operator fun <reified TService : Service> getValue(thisRef: Nothing?, prop: KProperty<*>): TService = get()
 
     fun each(block: (Service) -> Unit) {
         services.values.forEach(block)

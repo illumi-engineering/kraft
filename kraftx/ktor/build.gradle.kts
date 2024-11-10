@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm")
     id("org.jetbrains.dokka")
+    id("org.jetbrains.kotlinx.atomicfu")
     `maven-publish`
 }
 
@@ -62,7 +63,7 @@ publishing {
 
     publications {
         create<MavenPublication>("kraftxHttp") {
-            artifactId = "kraftx-http"
+            artifactId = "kraftx-ktor"
 
             from(components["java"])
 
@@ -78,5 +79,5 @@ publishing {
 }
 
 kotlin {
-    jvmToolchain(19)
+    jvmToolchain(21)
 }

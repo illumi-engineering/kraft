@@ -6,5 +6,5 @@ rootProject.name = "kraft"
 
 include("core")
 
-include("kraftx:http")
+include("kraftx:ktor")
 include("kraftx:exposed")
