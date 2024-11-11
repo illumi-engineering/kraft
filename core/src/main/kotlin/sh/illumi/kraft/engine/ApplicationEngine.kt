@@ -5,6 +5,7 @@ import kotlinx.coroutines.runBlocking
 import sh.illumi.kraft.KraftException
 import sh.illumi.kraft.engine.ApplicationEngine.Default
 import sh.illumi.kraft.layer.ApplicationLayer
+import sh.illumi.kraft.util.argsMatchParams
 
 /**
  * An ApplicationEngine is the entry point for a Kraft application. It is
@@ -22,10 +23,12 @@ abstract class ApplicationEngine {
         rootLayer.start()
     }
 
-    inline fun <reified TLayer : ApplicationLayer> startRoot() = startRoot<TLayer> {
+    inline fun <reified TLayer : ApplicationLayer> startRoot(vararg constructorArgs: Any) = startRoot<TLayer> {
         TLayer::class.constructors.firstOrNull {
-            it.parameters.size == 1 && it.parameters[0].type.classifier == CoroutineScope::class
-        }?.call(this) ?: throw KraftException("Root layer has no suitable constructor")
+            it.parameters.size == 1 + constructorArgs.size &&
+            it.parameters[0].type.classifier == CoroutineScope::class &&
+            argsMatchParams(constructorArgs, it.parameters.drop(1).toTypedArray())
+        }?.call(this, *constructorArgs) ?: throw KraftException("Root layer has no suitable constructor")
     }
 
     companion object Default : ApplicationEngine()
