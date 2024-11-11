@@ -2,7 +2,7 @@ package sh.illumi.kraft.x.ktor
 
 import io.ktor.server.application.*
 import io.ktor.util.*
-import sh.illumi.kraft.layer.RootLayer
+import sh.illumi.kraft.layer.ApplicationLayer
 
 class KraftKtor(configuration: Configuration) {
     val rootLayer = configuration.rootLayer
@@ -19,6 +19,6 @@ class KraftKtor(configuration: Configuration) {
     }
 
     class Configuration {
-        lateinit var rootLayer: RootLayer
+        lateinit var rootLayer: ApplicationLayer
     }
 }

@@ -3,7 +3,7 @@ package sh.illumi.kraft.service
 import kotlinx.coroutines.CoroutineScope
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import sh.illumi.kraft.layer.RootLayer
+import sh.illumi.kraft.layer.ApplicationLayer
 
 /**
  * Base interface for services
@@ -13,7 +13,7 @@ import sh.illumi.kraft.layer.RootLayer
  */
 interface Service {
     val coroutineScope: CoroutineScope
-    val rootLayer: RootLayer
+    val rootLayer: ApplicationLayer
     val log: Logger get() = LoggerFactory.getLogger(this::class.java)
 
     fun onStart() {}

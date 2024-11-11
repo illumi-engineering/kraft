@@ -4,7 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import sh.illumi.kraft.KraftException
 import sh.illumi.kraft.engine.ApplicationEngine.Default
-import sh.illumi.kraft.layer.RootLayer
+import sh.illumi.kraft.layer.ApplicationLayer
 
 /**
  * An ApplicationEngine is the entry point for a Kraft application. It is
@@ -15,15 +15,15 @@ import sh.illumi.kraft.layer.RootLayer
  * created by extending this class.
  */
 abstract class ApplicationEngine {
-    lateinit var rootLayer: RootLayer private set
+    lateinit var rootLayer: ApplicationLayer private set
 
-    fun <TRootLayer : RootLayer> startRoot(createRoot: suspend CoroutineScope.() -> TRootLayer) = runBlocking {
+    fun <TLayer : ApplicationLayer> startRoot(createRoot: suspend CoroutineScope.() -> ApplicationLayer) = runBlocking {
         rootLayer = createRoot()
         rootLayer.start()
     }
 
-    inline fun <reified TRootLayer : RootLayer> startRoot() = startRoot {
-        TRootLayer::class.constructors.firstOrNull {
+    inline fun <reified TLayer : ApplicationLayer> startRoot() = startRoot<TLayer> {
+        TLayer::class.constructors.firstOrNull {
             it.parameters.size == 1 && it.parameters[0].type.classifier == CoroutineScope::class
         }?.call(this) ?: throw KraftException("Root layer has no suitable constructor")
     }

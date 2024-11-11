@@ -1,6 +1,6 @@
 package sh.illumi.kraft.x.exposed.extensions
 
-import sh.illumi.kraft.layer.RootLayer
+import sh.illumi.kraft.layer.ApplicationLayer
 import sh.illumi.kraft.x.exposed.DbManager
 import sh.illumi.kraft.x.exposed.DbManagerFactory
 import sh.illumi.kraft.x.exposed.dsl.ExposedDbManagerConfigDsl
@@ -13,7 +13,7 @@ inline fun <TLayer, reified TDbConfig, reified TDbManager> TLayer.createExposed(
     noinline configure: TDbConfig.() -> Unit
 ): TDbManager
 where
-    TLayer : RootLayer,
+    TLayer : ApplicationLayer,
     TLayer : LayerWithExposed,
     TDbConfig : ExposedDbManagerConfigDsl,
     TDbManager : DbManager<TDbConfig>

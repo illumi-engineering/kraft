@@ -1,11 +1,11 @@
 package sh.illumi.kraft.x.exposed.dsl
 
-import sh.illumi.kraft.layer.RootLayer
+import sh.illumi.kraft.layer.ApplicationLayer
 import sh.illumi.kraft.x.exposed.DbManager
 import sh.illumi.kraft.x.exposed.DbManagerFactory
 
 abstract class ExposedDbManagerConfigDsl(
-    private val layer: RootLayer,
+    private val layer: ApplicationLayer,
     var jdbcUrl: String = "",
     var driverClassName: String = "",
     var username: String = "",
@@ -22,7 +22,7 @@ abstract class ExposedDbManagerConfigDsl(
     }
 
     class Hikari(
-        layer: RootLayer,
+        layer: ApplicationLayer,
         jdbcUrl: String = "",
         driverClassName: String = "",
         username: String = "",
@@ -39,7 +39,7 @@ abstract class ExposedDbManagerConfigDsl(
     }
 
     class Single(
-        layer: RootLayer,
+        layer: ApplicationLayer,
         jdbcUrl: String = "",
         driverClassName: String = "",
         username: String = "",
@@ -55,7 +55,7 @@ abstract class ExposedDbManagerConfigDsl(
 }
 
 object Hikari : DbManagerFactory<ExposedDbManagerConfigDsl.Hikari, DbManager.Hikari> {
-    override fun create(layer: RootLayer, configure: ExposedDbManagerConfigDsl.Hikari.() -> Unit) =
+    override fun create(layer: ApplicationLayer, configure: ExposedDbManagerConfigDsl.Hikari.() -> Unit) =
         ExposedDbManagerConfigDsl.Hikari(layer)
             .apply(configure)
             .also { it.check() }
@@ -63,7 +63,7 @@ object Hikari : DbManagerFactory<ExposedDbManagerConfigDsl.Hikari, DbManager.Hik
 }
 
 object Single : DbManagerFactory<ExposedDbManagerConfigDsl.Single, DbManager.Single> {
-    override fun create(layer: RootLayer, configure: ExposedDbManagerConfigDsl.Single.() -> Unit) =
+    override fun create(layer: ApplicationLayer, configure: ExposedDbManagerConfigDsl.Single.() -> Unit) =
         ExposedDbManagerConfigDsl.Single(layer)
             .apply(configure)
             .also { it.check() }

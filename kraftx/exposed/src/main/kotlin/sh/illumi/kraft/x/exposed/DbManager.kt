@@ -12,11 +12,11 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import sh.illumi.kraft.layer.RootLayer
+import sh.illumi.kraft.layer.ApplicationLayer
 import sh.illumi.kraft.x.exposed.dsl.ExposedDbManagerConfigDsl
 
 abstract class DbManager<TConfig : ExposedDbManagerConfigDsl>(
-    private val layer: RootLayer,
+    private val layer: ApplicationLayer,
     config: TConfig,
 ) {
     abstract val db: Database
@@ -26,7 +26,7 @@ abstract class DbManager<TConfig : ExposedDbManagerConfigDsl>(
     protected val log: Logger get() = LoggerFactory.getLogger(this::class.java)
 
     class Hikari(
-        layer: RootLayer,
+        layer: ApplicationLayer,
         config: ExposedDbManagerConfigDsl.Hikari,
     ) : DbManager<ExposedDbManagerConfigDsl.Hikari>(layer, config) {
         override val isPooled = true
@@ -44,7 +44,7 @@ abstract class DbManager<TConfig : ExposedDbManagerConfigDsl>(
     }
 
     class Single(
-        layer: RootLayer,
+        layer: ApplicationLayer,
         config: ExposedDbManagerConfigDsl.Single,
     ) : DbManager<ExposedDbManagerConfigDsl.Single>(layer, config) {
         override val isPooled = false

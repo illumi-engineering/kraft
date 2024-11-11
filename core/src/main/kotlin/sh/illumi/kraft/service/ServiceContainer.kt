@@ -4,9 +4,9 @@ import kotlinx.coroutines.CoroutineScope
 import sh.illumi.kraft.KraftException
 import sh.illumi.kraft.ServiceContainerException
 import sh.illumi.kraft.layer.ApplicationLayer
+import sh.illumi.kraft.util.argsMatchParams
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty
-
 class ServiceContainer(
     val applicationLayer: ApplicationLayer
 ) {
@@ -27,13 +27,12 @@ class ServiceContainer(
      * @throws KraftException If the service layer has no parent
      *
      * @see getServiceConstructor
-     * @see ApplicationLayer.getLayersToRoot
      */
     inline fun <reified TService : Service> instantiateService(): TService =
         getServiceConstructor<TService>()
             .call(
                 applicationLayer.coroutineScope,
-                *applicationLayer.getLayersToRoot().reversed().toTypedArray()
+                *applicationLayer.layers.toRoot.reversed().toTypedArray()
             )
 
     /**
@@ -41,22 +40,17 @@ class ServiceContainer(
      *
      * @return The constructor for the service
      * @throws KraftException If the service layer has no parent
-     *
-     * @see ApplicationLayer.getClassForIndex
      */
     inline fun <reified TService : Service> getServiceConstructor(): KFunction<TService> =
         TService::class.constructors.firstOrNull {
             if (it.parameters.size != expectedParamsLength) return@firstOrNull false
-
-            for ((index, parameter) in it.parameters.withIndex()) {
-                when (index) {
-                    0 -> if (parameter.type.classifier != CoroutineScope::class) return@firstOrNull false
-                    else -> if (parameter.type.classifier != applicationLayer.getClassForIndex(index - 1)) return@firstOrNull false
-                }
-            }
-
-            true
+            if (it.parameters[0].type.classifier != CoroutineScope::class) return@firstOrNull false
+            argsMatchParams(
+                applicationLayer.layers.toRoot.reversed().toTypedArray(),
+                it.parameters.drop(1).toTypedArray()
+            )
         } ?: throw ServiceContainerException(this, "Service ${TService::class.simpleName} has no suitable constructor")
+
 
     /**
      * Get a service by its [key][serviceKey]
