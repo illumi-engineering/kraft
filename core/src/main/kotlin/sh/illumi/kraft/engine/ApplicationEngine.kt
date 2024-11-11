@@ -18,6 +18,12 @@ import sh.illumi.kraft.util.argsMatchParams
 abstract class ApplicationEngine {
     lateinit var rootLayer: ApplicationLayer private set
 
+    fun registerShutdownHook() {
+        Runtime.getRuntime().addShutdownHook(Thread {
+            rootLayer.shutdown()
+        })
+    }
+
     fun <TLayer : ApplicationLayer> startRoot(createRoot: suspend CoroutineScope.() -> ApplicationLayer) = runBlocking {
         rootLayer = createRoot()
         rootLayer.start()
