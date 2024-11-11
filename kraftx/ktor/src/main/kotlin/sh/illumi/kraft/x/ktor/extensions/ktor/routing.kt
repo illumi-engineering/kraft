@@ -1,4 +1,4 @@
-package sh.illumi.kraft.x.ktor.extensions
+package sh.illumi.kraft.x.ktor.extensions.ktor
 
 import io.ktor.server.routing.*
 import sh.illumi.kraft.service.ServiceContainer

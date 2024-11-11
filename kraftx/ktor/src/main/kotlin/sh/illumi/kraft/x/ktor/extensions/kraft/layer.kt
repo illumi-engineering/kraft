@@ -1,4 +1,4 @@
-package sh.illumi.kraft.x.ktor.extensions
+package sh.illumi.kraft.x.ktor.extensions.kraft
 
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -15,9 +15,8 @@ fun <TEngine, TConfiguration> ApplicationLayer.embeddedServer(
 where
     TEngine : ApplicationEngine,
     TConfiguration : ApplicationEngine.Configuration
-{
-    val root = this // tired
-    return this.coroutineScope.embeddedServer(factory, port, host, watchPaths, this.coroutineScope.coroutineContext) {
+= this.let { root -> // wired
+    root.coroutineScope.embeddedServer(factory, port, host, watchPaths, this.coroutineScope.coroutineContext) {
         install(KraftKtor) {
             rootLayer = root
         }
