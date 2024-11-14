@@ -2,10 +2,12 @@ package sh.illumi.kraft.engine
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import org.slf4j.Logger
 import sh.illumi.kraft.KraftException
 import sh.illumi.kraft.engine.ApplicationEngine.Default
 import sh.illumi.kraft.layer.ApplicationLayer
 import sh.illumi.kraft.util.argsMatchParams
+import kotlin.reflect.KClass
 
 /**
  * An ApplicationEngine is the entry point for a Kraft application. It is
@@ -16,12 +18,18 @@ import sh.illumi.kraft.util.argsMatchParams
  * created by extending this interface.
  */
 interface ApplicationEngine {
+    val log: Logger get() = org.slf4j.LoggerFactory.getLogger(this.javaClass)
     fun registerShutdownHook()
 
-    fun <TLayer : ApplicationLayer> createRoot(createRoot: () -> TLayer): TLayer {
-        val rootLayer = createRoot()
-        return rootLayer
-    }
+    fun <TRootLayer : ApplicationLayer> createRoot(
+        layerClass: KClass<TRootLayer>,
+        coroutineScope: CoroutineScope,
+        vararg constructorArgs: Any
+    ): TRootLayer = layerClass.constructors.firstOrNull {
+        it.parameters.size == 1 + constructorArgs.size &&
+                it.parameters[0].type.classifier == CoroutineScope::class &&
+                argsMatchParams(constructorArgs, it.parameters.drop(1).toTypedArray())
+    }?.call(coroutineScope, *constructorArgs) ?: throw KraftException("Root layer has no suitable constructor")
 
      interface Default : ApplicationEngine {
          val coroutineScope get() = CoroutineScope(Dispatchers.Default)
@@ -36,18 +44,12 @@ interface ApplicationEngine {
      }
 }
 
-inline fun <reified TLayer : ApplicationLayer> Default.startRoot(vararg constructorArgs: Any) {
-    rootLayer = createRoot<TLayer>(coroutineScope, *constructorArgs)
+inline fun <reified TRootLayer : ApplicationLayer> Default.startRoot(vararg constructorArgs: Any) {
+    rootLayer = createRoot<TRootLayer>(coroutineScope, *constructorArgs)
     rootLayer.start()
 }
 
-inline fun <reified TLayer : ApplicationLayer> ApplicationEngine.createRoot(
+inline fun <reified TRootLayer : ApplicationLayer> ApplicationEngine.createRoot(
     coroutineScope: CoroutineScope,
     vararg constructorArgs: Any
-) = createRoot {
-    TLayer::class.constructors.firstOrNull {
-        it.parameters.size == 1 + constructorArgs.size &&
-        it.parameters[0].type.classifier == CoroutineScope::class &&
-        argsMatchParams(constructorArgs, it.parameters.drop(1).toTypedArray())
-    }?.call(coroutineScope, *constructorArgs) ?: throw KraftException("Root layer has no suitable constructor")
-}
+) = createRoot(TRootLayer::class, coroutineScope, *constructorArgs)

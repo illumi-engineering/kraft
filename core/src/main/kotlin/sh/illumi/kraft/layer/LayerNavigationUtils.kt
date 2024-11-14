@@ -1,8 +1,11 @@
 package sh.illumi.kraft.layer
 
+import org.slf4j.LoggerFactory
 import sh.illumi.kraft.KraftException
 
 class LayerNavigationUtils(val applicationLayer: ApplicationLayer) {
+    private val log = LoggerFactory.getLogger(this.javaClass)
+
     /**
      * All the layers from this layer to the root layer
      */
@@ -15,6 +18,8 @@ class LayerNavigationUtils(val applicationLayer: ApplicationLayer) {
             if (!currentLayer.isRoot) currentLayer.parent?.let { currentLayer = it }
             else break
         }
+
+        log.debug("Layers from ${this.applicationLayer.javaClass.simpleName} to root: ${layers.joinToString { it.javaClass.simpleName }}")
 
         return layers
     }

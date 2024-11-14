@@ -1,21 +1,24 @@
 package sh.illumi.kraft.service
 
 import kotlinx.coroutines.CoroutineScope
+import org.slf4j.LoggerFactory
 import sh.illumi.kraft.KraftException
 import sh.illumi.kraft.ServiceContainerException
 import sh.illumi.kraft.layer.ApplicationLayer
 import sh.illumi.kraft.util.argsMatchParams
+import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty
 class ServiceContainer(
     val applicationLayer: ApplicationLayer
 ) {
     private val services = mutableMapOf<String, Service>()
+    private val log = LoggerFactory.getLogger(this.javaClass)
 
     /**
      * The expected length of the parameters for a service constructor in this layer
      */
-    val expectedParamsLength: Int
+    private val expectedParamsLength: Int
         // add 2 because root layer has depth 0 and CoroutineScope is the first parameter
         get() = applicationLayer.depth + 2
 
@@ -29,7 +32,10 @@ class ServiceContainer(
      * @see getServiceConstructor
      */
     inline fun <reified TService : Service> instantiateService(): TService =
-        getServiceConstructor<TService>()
+        instantiateService(TService::class)
+
+    fun <TService : Service> instantiateService(serviceClass: KClass<TService>): TService =
+        getServiceConstructor(serviceClass)
             .call(
                 applicationLayer.coroutineScope,
                 *applicationLayer.layers.toRoot.reversed().toTypedArray()
@@ -42,15 +48,18 @@ class ServiceContainer(
      * @throws KraftException If the service layer has no parent
      */
     inline fun <reified TService : Service> getServiceConstructor(): KFunction<TService> =
-        TService::class.constructors.firstOrNull {
+        getServiceConstructor(TService::class)
+
+    fun <TService : Service> getServiceConstructor(serviceClass: KClass<TService>): KFunction<TService> =
+        serviceClass.constructors.firstOrNull {
             if (it.parameters.size != expectedParamsLength) return@firstOrNull false
             if (it.parameters[0].type.classifier != CoroutineScope::class) return@firstOrNull false
+
             argsMatchParams(
                 applicationLayer.layers.toRoot.reversed().toTypedArray(),
                 it.parameters.drop(1).toTypedArray()
             )
-        } ?: throw ServiceContainerException(this, "Service ${TService::class.simpleName} has no suitable constructor")
-
+        } ?: throw ServiceContainerException(this, "Service ${serviceClass.simpleName} has no suitable constructor")
 
     /**
      * Get a service by its [key][serviceKey]
@@ -66,12 +75,9 @@ class ServiceContainer(
      * @return The service of type [TService]
      * @throws KraftException If the service layer stack has no root or a parent is missing before the root layer
      */
-    inline fun <reified TService : Service> get(): TService {
-        val annotation = ServiceMetadata.resolveAnnotation(TService::class, this)
-
-        return get(annotation.key) as? TService
+    inline fun <reified TService : Service> get(): TService =
+        get(ServiceMetadata.resolveAnnotation(TService::class, this).key) as? TService
             ?: instantiateService<TService>().also { put(it) }
-    }
 
     /**
      * Register a [Service] in this layer. You can call this method with a
