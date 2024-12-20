@@ -4,7 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.slf4j.Logger
 import sh.illumi.kraft.KraftException
-import sh.illumi.kraft.engine.ApplicationEngine.Default
+import sh.illumi.kraft.engine.ApplicationEngine.Simple
 import sh.illumi.kraft.layer.ApplicationLayer
 import sh.illumi.kraft.util.argsMatchParams
 import kotlin.reflect.KClass
@@ -13,7 +13,7 @@ import kotlin.reflect.KClass
  * An ApplicationEngine is the entry point for a Kraft application. It is
  * responsible for initializing coroutine scopes and starting root layers.
  *
- * The included [Default] class can be used as a default application engine if
+ * The included [Simple] class can be used as a default application engine if
  * no extra functionality is needed, or a custom application engine can be
  * created by extending this interface.
  */
@@ -31,23 +31,19 @@ interface ApplicationEngine {
                 argsMatchParams(constructorArgs, it.parameters.drop(1).toTypedArray())
     }?.call(coroutineScope, *constructorArgs) ?: throw KraftException("Root layer has no suitable constructor")
 
-     interface Default : ApplicationEngine {
+     interface Simple<TLayer : ApplicationLayer> : ApplicationEngine {
          val coroutineScope get() = CoroutineScope(Dispatchers.Default)
-         var rootLayer: ApplicationLayer
+         val rootLayer: TLayer
 
          override fun registerShutdownHook() {
              Runtime.getRuntime().addShutdownHook(Thread {
                  rootLayer.shutdown()
              })
          }
-
      }
 }
 
-inline fun <reified TRootLayer : ApplicationLayer> Default.startRoot(vararg constructorArgs: Any) {
-    rootLayer = createRoot<TRootLayer>(coroutineScope, *constructorArgs)
-    rootLayer.start()
-}
+inline fun <reified TRootLayer : ApplicationLayer> ApplicationEngine.Simple<TRootLayer>.createRoot(vararg constructorArgs: Any) = createRoot(TRootLayer::class, coroutineScope, *constructorArgs)
 
 inline fun <reified TRootLayer : ApplicationLayer> ApplicationEngine.createRoot(
     coroutineScope: CoroutineScope,
