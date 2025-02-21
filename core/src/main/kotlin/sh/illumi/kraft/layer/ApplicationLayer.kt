@@ -30,7 +30,11 @@ interface ApplicationLayer {
     val depth get() = layers.toRoot.size - 1 // root layer has depth 0
 
     fun start() {
-        services.each { it.onStart() }
+        log.info("Starting layer ${this::class.simpleName}")
+        services.each {
+            log.info("Calling ${it::class.simpleName}.onStart()")
+            it.onStart()
+        }
     }
 
     fun shutdown() {

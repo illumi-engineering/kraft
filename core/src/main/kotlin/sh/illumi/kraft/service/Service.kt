@@ -16,6 +16,8 @@ interface Service {
     val rootLayer: ApplicationLayer
     val log: Logger get() = LoggerFactory.getLogger(this::class.java)
 
-    fun onStart() {}
+    fun onStart() {
+        log.info("Starting service ${this::class.simpleName}")
+    }
     fun onShutdown() {}
 }

@@ -12,7 +12,7 @@ import kotlin.reflect.KProperty
 class ServiceContainer(
     val applicationLayer: ApplicationLayer
 ) {
-    private val services = mutableMapOf<String, Service>()
+    val services = mutableMapOf<String, Service>()
     private val log = LoggerFactory.getLogger(this.javaClass)
 
     /**
@@ -102,6 +102,10 @@ class ServiceContainer(
     inline operator fun <reified TService : Service> getValue(thisRef: Nothing?, prop: KProperty<*>): TService = get()
 
     fun each(block: (Service) -> Unit) {
-        services.values.forEach(block)
+        log.info("Iterating over services in layer ${applicationLayer::class.simpleName}")
+        services.values.forEach {
+            log.info("Calling ${it::class.simpleName}.${block}")
+            block(it)
+        }
     }
 }

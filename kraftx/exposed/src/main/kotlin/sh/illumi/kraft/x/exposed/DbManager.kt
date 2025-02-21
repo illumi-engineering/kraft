@@ -15,41 +15,53 @@ import org.slf4j.LoggerFactory
 import sh.illumi.kraft.layer.ApplicationLayer
 import sh.illumi.kraft.x.exposed.dsl.ExposedDbManagerConfigDsl
 
-abstract class DbManager<TConfig : ExposedDbManagerConfigDsl>(
+abstract class DbManager(
     private val layer: ApplicationLayer,
-    config: TConfig,
+    parallelism: Int,
 ) {
     abstract val db: Database
     abstract val isPooled: Boolean
 
-    private val transactionContext: CoroutineDispatcher = Dispatchers.IO.limitedParallelism(config.transactionParallelism)
+    private val transactionContext: CoroutineDispatcher = Dispatchers.IO.limitedParallelism(parallelism)
     protected val log: Logger get() = LoggerFactory.getLogger(this::class.java)
 
     class Hikari(
         layer: ApplicationLayer,
         config: ExposedDbManagerConfigDsl.Hikari,
-    ) : DbManager<ExposedDbManagerConfigDsl.Hikari>(layer, config) {
+    ) : DbManager(layer, config.transactionParallelism) {
         override val isPooled = true
-        override val db by lazy {
-            Database.connect(HikariDataSource(HikariConfig().apply {
-                this.jdbcUrl = config.jdbcUrl
-                this.driverClassName = config.driverClassName
-                this.username = config.username
-                this.password = config.password
-                this.maximumPoolSize = config.maximumPoolSize
-                this.isReadOnly = config.isReadOnly
-                this.transactionIsolation = config.transactionIsolation
-            }))
+        override val db = Database.connect(HikariDataSource(HikariConfig().apply {
+            this.jdbcUrl = config.jdbcUrl
+            this.driverClassName = config.driverClassName
+            this.username = config.username
+            this.password = config.password
+            this.maximumPoolSize = config.maximumPoolSize
+            this.isReadOnly = config.isReadOnly
+            this.transactionIsolation = config.transactionIsolation
+        }))
+
+        companion object : DbManagerFactory<ExposedDbManagerConfigDsl.Hikari> {
+            override fun create(layer: ApplicationLayer, configure: ExposedDbManagerConfigDsl.Hikari.() -> Unit) =
+                ExposedDbManagerConfigDsl.Hikari()
+                    .apply(configure)
+                    .also { it.check() }
+                    .let { Hikari(layer, it) }
         }
     }
 
     class Single(
         layer: ApplicationLayer,
         config: ExposedDbManagerConfigDsl.Single,
-    ) : DbManager<ExposedDbManagerConfigDsl.Single>(layer, config) {
+    ) : DbManager(layer, config.transactionParallelism) {
         override val isPooled = false
-        override val db by lazy {
-            Database.connect(config.jdbcUrl, config.driverClassName, config.username, config.password)
+        override val db = Database.connect(config.jdbcUrl, config.driverClassName, config.username, config.password)
+
+        companion object : DbManagerFactory<ExposedDbManagerConfigDsl.Single> {
+            override fun create(layer: ApplicationLayer, configure: ExposedDbManagerConfigDsl.Single.() -> Unit) =
+                ExposedDbManagerConfigDsl.Single()
+                    .apply(configure)
+                    .also { it.check() }
+                    .let { Single(layer, it) }
         }
     }
 
