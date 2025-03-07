@@ -1,8 +1,8 @@
 plugins {
     kotlin("jvm")
-    id("org.jetbrains.dokka")
+    alias(libs.plugins.dokka)
     id("org.jetbrains.kotlinx.atomicfu")
-    `maven-publish`
+    alias(libs.plugins.vanniktech.mavenPublish)
 }
 
 group = rootProject.group

@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="core-mpp-jvm-0.0.1">
+    <output-path>$PROJECT_DIR$/core-mpp/build/libs</output-path>
+    <root id="archive" name="core-mpp-jvm-0.0.1.jar">
+      <element id="module-output" name="kraft.core-mpp.jvmMain" />
+    </root>
+  </artifact>
+</component>
