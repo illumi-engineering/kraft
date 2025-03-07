@@ -23,8 +23,6 @@ plugins {
 
 rootProject.name = "kraft"
 
-include("core")
-
-include("kraftx:ktor")
-include("kraftx:exposed")
-include("core-mpp")
+include(":core")
+include(":kraftx:ktor")
+include(":kraftx:exposed")

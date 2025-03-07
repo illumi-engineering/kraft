@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "2.0.0"
+    alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.dokka)
     alias(libs.plugins.vanniktech.mavenPublish)
 }
@@ -7,27 +7,36 @@ plugins {
 group = rootProject.group
 version = rootProject.version
 
-dependencies {
-    implementation(project(":core"))
+kotlin {
+    jvm()
+    
+    sourceSets {
+        val jvmMain by getting {
+            dependencies {
 
-    implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.kotlinx.coroutines.slf4j)
+                implementation(project(":core"))
 
-    implementation(libs.slf4j.api)
+                implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.kotlinx.coroutines.slf4j)
 
-    implementation(libs.exposed.core)
-    implementation(libs.exposed.jdbc)
+                implementation(libs.slf4j.api)
 
-    implementation(libs.hikari)
+                implementation(libs.exposed.core)
+                implementation(libs.exposed.jdbc)
 
-    testImplementation(kotlin("test"))
-    testImplementation(libs.kotlinx.coroutines.test)
+                implementation(libs.hikari)
+
+//                testImplementation(kotlin("test"))
+//                testImplementation(libs.kotlinx.coroutines.test)
+            }
+        }
+    }
 }
 
-val sourcesJar by tasks.registering(Jar::class) {
-    archiveClassifier.set("sources")
-    from(sourceSets.main.get().allSource)
-}
+//val sourcesJar by tasks.registering(Jar::class) {
+//    archiveClassifier.set("sources")
+//    from(sourceSets.jvmMain.get().allSource)
+//}
 
 val dokkaHtmlJar by tasks.registering(Jar::class) {
     dependsOn(tasks.dokkaHtml)
@@ -41,7 +50,7 @@ val dokkaJavadocJar by tasks.registering(Jar::class) {
     archiveClassifier.set("javadoc")
 }
 
-publishing {
+mavenPublishing {
     repositories {
         mavenLocal()
         maven {
@@ -61,48 +70,50 @@ publishing {
             }
         }
     }
+    
+    coordinates(group.toString(), "kraftx-exposed", version.toString())
 
-    publications {
-        create<MavenPublication>("kraftxExposed") {
-            artifactId = "kraftx-exposed"
-
-            from(components["java"])
-
-            artifact(sourcesJar.get())
-            artifact(dokkaHtmlJar.get())
-            artifact(dokkaJavadocJar.get())
-
-            pom {
-                name = "KRAFT Extensions for Exposed"
-                description = "KRAFT - Kotlin Resource Assembly and Flow Toolkit"
-                url = "https://git.lizainslie.dev/illumi/kraft"
-
-                licenses {
-                    license {
-                        name = "MIT License"
-                        url = "https://opensource.org/licenses/MIT"
-                    }
-                }
-
-                developers {
-                    developer {
-                        id = "lizainslie"
-                        name = "Liz Ainslie"
-                        email = "lizzy@lizainslie.dev"
-                        url = "https://lizainslie.dev"
-                    }
-                }
-
-                scm {
-                    connection = "scm:git:git://git.lizainslie.dev/illumi/kraft.git"
-                    developerConnection = "scm:git:ssh://git.lizainslie.dev/illumi/kraft.git"
-                    url = "https://git.lizainslie.dev/illumi/kraft"
-                }
+    pom {
+        name = "KRAFT Extensions for Exposed"
+        description = "KRAFT - Kotlin Resource Assembly and Flow Toolkit"
+        url = "https://git.lizainslie.dev/illumi/kraft"
+    
+        licenses {
+            license {
+                name = "MIT License"
+                url = "https://opensource.org/licenses/MIT"
             }
+        }
+    
+        developers {
+            developer {
+                id = "lizainslie"
+                name = "Liz Ainslie"
+                email = "lizzy@lizainslie.dev"
+                url = "https://lizainslie.dev"
+            }
+        }
+    
+        scm {
+            connection = "scm:git:git://git.lizainslie.dev/illumi/kraft.git"
+            developerConnection = "scm:git:ssh://git.lizainslie.dev/illumi/kraft.git"
+            url = "https://git.lizainslie.dev/illumi/kraft"
         }
     }
 }
 
-kotlin {
-    jvmToolchain(21)
-}
+//publishing {
+//    publications {
+//        create<MavenPublication>("kraftxExposed") {
+//            artifactId = "kraftx-exposed"
+//
+//            from(components["java"])
+//
+////            artifact(sourcesJar.get())
+//            artifact(dokkaHtmlJar.get())
+//            artifact(dokkaJavadocJar.get())
+//
+//            
+//        }
+//    }
+//}

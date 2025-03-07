@@ -10,7 +10,6 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/core" />
-            <option value="$PROJECT_DIR$/core-mpp" />
             <option value="$PROJECT_DIR$/kraftx" />
             <option value="$PROJECT_DIR$/kraftx/exposed" />
             <option value="$PROJECT_DIR$/kraftx/ktor" />

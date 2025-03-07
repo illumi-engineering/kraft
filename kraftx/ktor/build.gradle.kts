@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm")
+    alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.dokka)
     id("org.jetbrains.kotlinx.atomicfu")
     alias(libs.plugins.vanniktech.mavenPublish)
@@ -9,24 +9,32 @@ group = rootProject.group
 version = rootProject.version
 
 
-dependencies {
-    implementation(project(":core"))
+kotlin { 
+    jvm()
+    
+    sourceSets {
+        val jvmMain by getting {
+            dependencies {
+                implementation(project(":core"))
 
-    implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.kotlinx.coroutines.slf4j)
+                implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.kotlinx.coroutines.slf4j)
 
-    implementation(libs.slf4j.api)
+                implementation(libs.slf4j.api)
 
-    implementation(libs.ktor.server.core)
+                implementation(libs.ktor.server.core)
 
-    testImplementation(kotlin("test"))
-    testImplementation(libs.kotlinx.coroutines.test)
+//                testImplementation(kotlin("test"))
+//                testImplementation(libs.kotlinx.coroutines.test)
+            }
+        }
+    }
 }
-
-val sourcesJar by tasks.registering(Jar::class) {
-    archiveClassifier.set("sources")
-    from(sourceSets.main.get().allSource)
-}
+//
+//val sourcesJar by tasks.registering(Jar::class) {
+//    archiveClassifier.set("sources")
+//    from(sourceSets.main.get().allSource)
+//}
 
 val dokkaHtmlJar by tasks.registering(Jar::class) {
     dependsOn(tasks.dokkaHtml)
@@ -40,7 +48,7 @@ val dokkaJavadocJar by tasks.registering(Jar::class) {
     archiveClassifier.set("javadoc")
 }
 
-publishing {
+mavenPublishing {
     repositories {
         mavenLocal()
         maven {
@@ -60,48 +68,34 @@ publishing {
             }
         }
     }
+    
+    coordinates(group.toString(), "kraftx-ktor", version.toString())
 
-    publications {
-        create<MavenPublication>("kraftxKtor") {
-            artifactId = "kraftx-ktor"
+    pom {
+        name = "KRAFT Extensions for Ktor"
+        description = "KRAFT - Kotlin Resource Assembly and Flow Toolkit"
+        url = "https://git.lizainslie.dev/illumi/kraft"
 
-            from(components["java"])
-
-            artifact(sourcesJar.get())
-            artifact(dokkaHtmlJar.get())
-            artifact(dokkaJavadocJar.get())
-
-            pom {
-                name = "KRAFT Extensions for Ktor"
-                description = "KRAFT - Kotlin Resource Assembly and Flow Toolkit"
-                url = "https://git.lizainslie.dev/illumi/kraft"
-
-                licenses {
-                    license {
-                        name = "MIT License"
-                        url = "https://opensource.org/licenses/MIT"
-                    }
-                }
-
-                developers {
-                    developer {
-                        id = "lizainslie"
-                        name = "Liz Ainslie"
-                        email = "lizzy@lizainslie.dev"
-                        url = "https://lizainslie.dev"
-                    }
-                }
-
-                scm {
-                    connection = "scm:git:git://git.lizainslie.dev/illumi/kraft.git"
-                    developerConnection = "scm:git:ssh://git.lizainslie.dev/illumi/kraft.git"
-                    url = "https://git.lizainslie.dev/illumi/kraft"
-                }
+        licenses {
+            license {
+                name = "MIT License"
+                url = "https://opensource.org/licenses/MIT"
             }
         }
-    }
-}
 
-kotlin {
-    jvmToolchain(21)
+        developers {
+            developer {
+                id = "lizainslie"
+                name = "Liz Ainslie"
+                email = "lizzy@lizainslie.dev"
+                url = "https://lizainslie.dev"
+            }
+        }
+
+        scm {
+            connection = "scm:git:git://git.lizainslie.dev/illumi/kraft.git"
+            developerConnection = "scm:git:ssh://git.lizainslie.dev/illumi/kraft.git"
+            url = "https://git.lizainslie.dev/illumi/kraft"
+        }
+    }
 }
