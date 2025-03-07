@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.dokka)
-    id("org.jetbrains.kotlinx.atomicfu")
     alias(libs.plugins.vanniktech.mavenPublish)
 }
 
@@ -13,7 +12,7 @@ kotlin {
     jvm()
     
     sourceSets {
-        val jvmMain by getting {
+        jvmMain {
             dependencies {
                 implementation(project(":core"))
 

@@ -12,11 +12,11 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import sh.illumi.kraft.layer.ApplicationLayer
+import sh.illumi.kraft.layer.Layer
 import sh.illumi.kraft.x.exposed.dsl.ExposedDbManagerConfigDsl
 
 abstract class DbManager(
-    private val layer: ApplicationLayer,
+    private val layer: Layer,
     parallelism: Int,
 ) {
     abstract val db: Database
@@ -26,7 +26,7 @@ abstract class DbManager(
     protected val log: Logger get() = LoggerFactory.getLogger(this::class.java)
 
     class Hikari(
-        layer: ApplicationLayer,
+        layer: Layer,
         config: ExposedDbManagerConfigDsl.Hikari,
     ) : DbManager(layer, config.transactionParallelism) {
         override val isPooled = true
@@ -41,7 +41,7 @@ abstract class DbManager(
         }))
 
         companion object : DbManagerFactory<ExposedDbManagerConfigDsl.Hikari> {
-            override fun create(layer: ApplicationLayer, configure: ExposedDbManagerConfigDsl.Hikari.() -> Unit) =
+            override fun create(layer: Layer, configure: ExposedDbManagerConfigDsl.Hikari.() -> Unit) =
                 ExposedDbManagerConfigDsl.Hikari()
                     .apply(configure)
                     .also { it.check() }
@@ -50,14 +50,14 @@ abstract class DbManager(
     }
 
     class Single(
-        layer: ApplicationLayer,
+        layer: Layer,
         config: ExposedDbManagerConfigDsl.Single,
     ) : DbManager(layer, config.transactionParallelism) {
         override val isPooled = false
         override val db = Database.connect(config.jdbcUrl, config.driverClassName, config.username, config.password)
 
         companion object : DbManagerFactory<ExposedDbManagerConfigDsl.Single> {
-            override fun create(layer: ApplicationLayer, configure: ExposedDbManagerConfigDsl.Single.() -> Unit) =
+            override fun create(layer: Layer, configure: ExposedDbManagerConfigDsl.Single.() -> Unit) =
                 ExposedDbManagerConfigDsl.Single()
                     .apply(configure)
                     .also { it.check() }

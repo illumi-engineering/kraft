@@ -11,7 +11,7 @@ kotlin {
     jvm()
     
     sourceSets {
-        val jvmMain by getting {
+        jvmMain {
             dependencies {
 
                 implementation(project(":core"))

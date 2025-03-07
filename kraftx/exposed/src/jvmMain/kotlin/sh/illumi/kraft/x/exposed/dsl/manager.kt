@@ -1,9 +1,5 @@
 package sh.illumi.kraft.x.exposed.dsl
 
-import sh.illumi.kraft.layer.ApplicationLayer
-import sh.illumi.kraft.x.exposed.DbManager
-import sh.illumi.kraft.x.exposed.DbManagerFactory
-
 abstract class ExposedDbManagerConfigDsl(
     var jdbcUrl: String = "",
     var driverClassName: String = "",

@@ -15,7 +15,7 @@ abstract class Layer : ServiceAccessor() {
         createLayer: (CoroutineScope) -> TLayer,
         block: TLayer.() -> TReturn
     ): TReturn {
-        val layer = createLayer(coroutineContext)
+        val layer = createLayer(coroutineScope)
         layer.parentLayer = this
         return layer.block()
     }

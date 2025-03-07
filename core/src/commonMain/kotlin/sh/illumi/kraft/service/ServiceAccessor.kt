@@ -5,7 +5,7 @@ import sh.illumi.kraft.layer.Layer
 
 abstract class ServiceAccessor {
     abstract val serviceContainer: ServiceContainer
-    abstract val coroutineContext: CoroutineScope
+    abstract val coroutineScope: CoroutineScope
     abstract val applicableLayer: Layer
     open val label: String get() = this::class.simpleName ?: "Abstract ServiceAccessor"
     

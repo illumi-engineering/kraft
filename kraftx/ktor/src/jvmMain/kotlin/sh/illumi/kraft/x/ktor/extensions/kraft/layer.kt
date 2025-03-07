@@ -2,10 +2,10 @@ package sh.illumi.kraft.x.ktor.extensions.kraft
 
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
-import sh.illumi.kraft.layer.ApplicationLayer
+import sh.illumi.kraft.layer.Layer
 import sh.illumi.kraft.x.ktor.KraftKtor
 
-fun <TEngine, TConfiguration> ApplicationLayer.embeddedServer(
+fun <TEngine, TConfiguration> Layer.embeddedServer(
     factory: ApplicationEngineFactory<TEngine, TConfiguration>,
     port: Int = 80,
     host: String = "0.0.0.0",
