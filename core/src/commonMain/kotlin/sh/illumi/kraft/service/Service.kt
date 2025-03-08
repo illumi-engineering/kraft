@@ -5,13 +5,14 @@ import sh.illumi.kraft.layer.Layer
 abstract class Service(
     protected val accessor: ServiceAccessor
 ) : ServiceAccessor() {
-    abstract val displayName: String?
+    open val displayName: String? = null
     override val label: String
         get() = displayName ?: super.label
     
-    override val applicableLayer: Layer
-        get() = accessor.applicableLayer
+    override val layer: Layer
+        get() = accessor.layer
     override val serviceContainer = accessor.serviceContainer
+    override val coroutineScope = accessor.coroutineScope
     
     open fun onStart() {}
     open fun onShutdown() {}

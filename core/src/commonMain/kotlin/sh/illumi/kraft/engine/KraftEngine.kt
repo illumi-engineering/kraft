@@ -6,18 +6,17 @@ import kotlinx.coroutines.launch
 import sh.illumi.kraft.layer.Layer
 
 class KraftEngine {
-    private val rootDefinitions = mutableListOf<RootDefinition>()
+    private val rootDefinitions = mutableListOf<RootDefinition<*>>()
     
-    fun addForegroundRoot(produceLayer: (CoroutineScope) -> Layer, setup: Layer.() -> Unit) {
+    fun <TLayer : Layer> addForegroundRoot(produceLayer: (CoroutineScope) -> TLayer, setup: TLayer.() -> Unit) {
         rootDefinitions += RootDefinition(produceLayer, Dispatchers.Main, setup) 
     }
     
+    fun <TLayer : Layer> addBackgroundRoot(produceLayer: (CoroutineScope) -> TLayer, setup: TLayer.() -> Unit) {
+        rootDefinitions += RootDefinition(produceLayer, Dispatchers.Default, setup) 
+    }
+    
     fun start() {
-        rootDefinitions.forEach { definition ->
-            CoroutineScope(definition.dispatcher).launch {
-                val layer = definition.produceLayer(this)
-                layer.apply(definition.setup)
-            }
-        }
+        rootDefinitions.forEach { it.start() }
     }
 }

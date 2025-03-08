@@ -1,18 +1,35 @@
 package sh.illumi.kraft.service
 
-sealed interface ServiceFactory<TService : Service> {
+import kotlin.reflect.KClass
+
+sealed interface ServiceFactory<TService : Service, TConfig : Any> {
+    var configure: TConfig.() -> Unit
+    fun construct(accessor: ServiceAccessor, configure: TConfig.() -> Unit): TService
     fun get(accessor: ServiceAccessor): TService
     
-    class Singleton<TService : Service>(private val ctor: (ServiceAccessor) -> TService) : ServiceFactory<TService> {
-        private var instance: TService? = null
+    abstract class Singleton<TService : Service, TConfig : Any>(
+        private val serviceClass: KClass<out TService>
+    ) : ServiceFactory<TService, TConfig> {
+        override lateinit var configure: TConfig.() -> Unit
         
-        override fun get(accessor: ServiceAccessor) =
-            instance ?: ctor(accessor).also { instance = it }
+        @Suppress("UNCHECKED_CAST")
+        override fun get(accessor: ServiceAccessor): TService {
+            val key = ServiceKey(ServiceKey.Tag.ServiceClass(serviceClass))
+            val service = accessor.serviceContainer.services.getOrPut(key) { construct(accessor, configure) }
+            return service as TService
+        }
     }
     
-    class Owned<TService : Service>(private val ctor: (ServiceAccessor) -> TService) : ServiceFactory<TService> {
-        private val servicesForAccessors = mutableMapOf<ServiceAccessor, TService>()
-        override fun get(accessor: ServiceAccessor) =
-            servicesForAccessors.getOrPut(accessor) { ctor(accessor) }
+    abstract class Owned<TService : Service, TConfig : Any>(
+        private val serviceClass: KClass<out TService>
+    ) : ServiceFactory<TService, TConfig> {
+        override lateinit var configure: TConfig.() -> Unit
+        
+        @Suppress("UNCHECKED_CAST")
+        override fun get(accessor: ServiceAccessor): TService {
+            val key = ServiceKey(ServiceKey.Tag.ServiceClass(serviceClass), ServiceKey.Tag.Accessor(accessor))
+            val service = accessor.serviceContainer.services.getOrPut(key) { construct(accessor, configure) }
+            return service as TService
+        }
     }
 }

@@ -7,16 +7,19 @@ import kotlin.reflect.safeCast
 class ServiceContainer(
     val parentLayer: Layer
 ) {
-    val serviceFactories = mutableMapOf<KClass<out Service>, ServiceFactory<*>>()
+    val serviceFactories = mutableMapOf<KClass<out Service>, ServiceFactory<*, *>>()
+    val services = mutableMapOf<ServiceKey, Service>()
     
-    fun <TService : Service> register(serviceClass: KClass<out TService>, factory: ServiceFactory<TService>) {
+    fun <TService : Service, TConfig : Any> register(
+        serviceClass: KClass<out TService>,
+        factory: ServiceFactory<TService, TConfig>,
+        configure: TConfig.() -> Unit
+    ) {
+        println("Registering service ${serviceClass.simpleName}")
+        factory.configure = configure
         serviceFactories[serviceClass] = factory
     }
     
-    fun <TService : Service> getService(serviceClass: KClass<out TService>, accessor: ServiceAccessor? = null): TService? =
-        serviceFactories[serviceClass]?.get(accessor ?: parentLayer)?.let { serviceClass.safeCast(it) }
-    
-    fun <TService : Service> requireService(serviceClass: KClass<out TService>): TService =
-        getService(serviceClass) 
-            ?: throw IllegalStateException("Service ${serviceClass.qualifiedName} not registered in layer ${parentLayer::class.simpleName}")
+    fun <TService : Service> getService(factory: ServiceFactory<TService, *>, accessor: ServiceAccessor? = null) =
+        factory.get(accessor ?: parentLayer)
 }

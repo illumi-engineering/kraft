@@ -24,5 +24,11 @@ plugins {
 rootProject.name = "kraft"
 
 include(":core")
+
+// KRAFT Extensions
 include(":kraftx:ktor")
 include(":kraftx:exposed")
+include(":kraftx:logging")
+
+// Examples
+include(":examples:playground-mpp")

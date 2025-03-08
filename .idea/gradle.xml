@@ -10,9 +10,12 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/examples" />
+            <option value="$PROJECT_DIR$/examples/playground-mpp" />
             <option value="$PROJECT_DIR$/kraftx" />
             <option value="$PROJECT_DIR$/kraftx/exposed" />
             <option value="$PROJECT_DIR$/kraftx/ktor" />
+            <option value="$PROJECT_DIR$/kraftx/logging" />
           </set>
         </option>
       </GradleProjectSettings>

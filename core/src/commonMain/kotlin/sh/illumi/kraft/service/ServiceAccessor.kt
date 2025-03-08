@@ -6,12 +6,9 @@ import sh.illumi.kraft.layer.Layer
 abstract class ServiceAccessor {
     abstract val serviceContainer: ServiceContainer
     abstract val coroutineScope: CoroutineScope
-    abstract val applicableLayer: Layer
+    abstract val layer: Layer
     open val label: String get() = this::class.simpleName ?: "Abstract ServiceAccessor"
     
-    inline fun <reified TService : Service> service(): TService? =
-        serviceContainer.getService(TService::class)
-    
-    inline fun <reified TService : Service> requireService(): TService =
-        serviceContainer.requireService(TService::class)
+    inline fun <reified TService : Service> service(factory: ServiceFactory<TService, *>) =
+        serviceContainer.getService(factory, this)
 }
