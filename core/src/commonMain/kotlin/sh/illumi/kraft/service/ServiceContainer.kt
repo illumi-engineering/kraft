@@ -2,7 +2,6 @@ package sh.illumi.kraft.service
 
 import sh.illumi.kraft.layer.Layer
 import kotlin.reflect.KClass
-import kotlin.reflect.safeCast
 
 class ServiceContainer(
     val parentLayer: Layer
@@ -15,7 +14,6 @@ class ServiceContainer(
         factory: ServiceFactory<TService, TConfig>,
         configure: TConfig.() -> Unit
     ) {
-        println("Registering service ${serviceClass.simpleName}")
         factory.configure = configure
         serviceFactories[serviceClass] = factory
     }

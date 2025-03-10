@@ -14,11 +14,11 @@ class ServiceKey(vararg tags: Tag<*>) {
         val tag: String
         val value: T
         
-        class Accessor(override val value: ServiceAccessor) : Tag<ServiceAccessor> {
+        data class Accessor(override val value: ServiceAccessor) : Tag<ServiceAccessor> {
             override val tag = "accessor"
         }
         
-        class ServiceClass(override val value: KClass<out Service>) : Tag<KClass<out Service>> {
+        data class ServiceClass(override val value: KClass<out Service>) : Tag<KClass<out Service>> {
             override val tag = "serviceClass"
         }
     }

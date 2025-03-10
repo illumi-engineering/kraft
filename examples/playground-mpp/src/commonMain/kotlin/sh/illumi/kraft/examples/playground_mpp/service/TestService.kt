@@ -3,7 +3,7 @@ package sh.illumi.kraft.examples.playground_mpp.service
 import sh.illumi.kraft.service.Service
 import sh.illumi.kraft.service.ServiceAccessor
 import sh.illumi.kraft.service.ServiceFactory
-import sh.illumi.kraft.service.dependingOnOwned
+import sh.illumi.kraft.service.dependingOn
 import sh.illumi.kraft.x.logging.service.LoggingService
 
 class TestService(
@@ -11,7 +11,7 @@ class TestService(
 ) : Service(accessor) {
     override val displayName = "Test Service"
     
-    val log by dependingOnOwned(LoggingService)
+    val log by dependingOn(LoggingService)
 
     override fun onStart() {
         log.debug("This message should not be displayed")

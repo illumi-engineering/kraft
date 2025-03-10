@@ -9,11 +9,11 @@ class KraftEngine {
     private val rootDefinitions = mutableListOf<RootDefinition<*>>()
     
     fun <TLayer : Layer> addForegroundRoot(produceLayer: (CoroutineScope) -> TLayer, setup: TLayer.() -> Unit) {
-        rootDefinitions += RootDefinition(produceLayer, Dispatchers.Main, setup) 
+        rootDefinitions += RootDefinition(produceLayer(CoroutineScope(Dispatchers.Main)), Dispatchers.Main, setup) 
     }
     
     fun <TLayer : Layer> addBackgroundRoot(produceLayer: (CoroutineScope) -> TLayer, setup: TLayer.() -> Unit) {
-        rootDefinitions += RootDefinition(produceLayer, Dispatchers.Default, setup) 
+        rootDefinitions += RootDefinition(produceLayer(CoroutineScope(Dispatchers.Default)), Dispatchers.Default, setup)
     }
     
     fun start() {
