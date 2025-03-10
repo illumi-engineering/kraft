@@ -25,9 +25,13 @@ kotlin {
                 implementation(libs.exposed.jdbc)
 
                 implementation(libs.hikari)
-
-//                testImplementation(kotlin("test"))
-//                testImplementation(libs.kotlinx.coroutines.test)
+            }
+        }
+        
+        jvmTest {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation(libs.kotlinx.coroutines.test)
             }
         }
     }
@@ -101,19 +105,3 @@ mavenPublishing {
         }
     }
 }
-
-//publishing {
-//    publications {
-//        create<MavenPublication>("kraftxExposed") {
-//            artifactId = "kraftx-exposed"
-//
-//            from(components["java"])
-//
-////            artifact(sourcesJar.get())
-//            artifact(dokkaHtmlJar.get())
-//            artifact(dokkaJavadocJar.get())
-//
-//            
-//        }
-//    }
-//}

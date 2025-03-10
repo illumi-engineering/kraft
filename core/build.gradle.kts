@@ -56,3 +56,55 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 }
+
+mavenPublishing {
+    repositories {
+        mavenLocal()
+        maven {
+            name = "frottingServicesSnapshots"
+            url = uri("https://repo.frotting.services/repository/maven-snapshots/")
+            credentials(PasswordCredentials::class)
+            authentication {
+                create<BasicAuthentication>("basic")
+            }
+        }
+        maven {
+            name = "frottingServicesReleases"
+            url = uri("https://repo.frotting.services/repository/maven-releases/")
+            credentials(PasswordCredentials::class)
+            authentication {
+                create<BasicAuthentication>("basic")
+            }
+        }
+    }
+    
+    coordinates(group.toString(), "kraft", version.toString())
+    
+    pom {
+        name = "Kraft Core"
+        description = "KRAFT - Kotlin Resource Assembly and Flow Toolkit"
+        url = "https://git.lizainslie.dev/illumi/kraft"
+
+        licenses { 
+            license {
+                name = "MIT License"
+                url = "https://opensource.org/licenses/MIT"
+            }
+        }
+
+        developers {
+            developer {
+                id = "lizainslie"
+                name = "Liz Ainslie"
+                email = "lizzy@lizainslie.dev"
+                url = "https://lizainslie.dev"
+            }
+        }
+
+        scm {
+            connection = "scm:git:git://git.lizainslie.dev/illumi/kraft.git"
+            developerConnection = "scm:git:ssh://git.lizainslie.dev/illumi/kraft.git"
+            url = "https://git.lizainslie.dev/illumi/kraft"
+        }
+    }
+}
