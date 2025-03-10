@@ -56,7 +56,7 @@ class LoggingService(
         val providerConfigs = mutableSetOf<ProviderConfiguration>()
         
         fun withProvider(provider: LoggingProvider, configure: ProviderConfiguration.() -> Unit) {
-            ProviderConfiguration(provider).apply(configure)
+            providerConfigs += ProviderConfiguration(provider).apply(configure)
         }
         
         class ProviderConfiguration(
