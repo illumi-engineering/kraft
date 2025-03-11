@@ -15,9 +15,6 @@ allprojects {
         }
 
         mavenCentral()
-    }
-
-    tasks.withType<Test> {
-        useJUnitPlatform()
+        google()
     }
 }

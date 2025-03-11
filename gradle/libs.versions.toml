@@ -1,10 +1,10 @@
 [versions]
 kotlin = "2.1.10"
-kotlinx-coroutines = "1.9.0"
+kotlinx-coroutines = "1.10.1"
 slf4j = "2.0.16"
-ktor = "3.0.0"
-exposed = "0.56.0"
-hikari = "6.0.0"
+ktor = "3.1.0"
+exposed = "0.59.0"
+hikari = "6.2.1"
 agp = "8.5.2"
 android-minSdk = "24"
 android-compileSdk = "34"
@@ -34,4 +34,4 @@ hikari = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-vanniktech-mavenPublish = { id = "com.vanniktech.maven.publish", version = "0.29.0" }
+vanniktech-mavenPublish = { id = "com.vanniktech.maven.publish", version = "0.31.0" }

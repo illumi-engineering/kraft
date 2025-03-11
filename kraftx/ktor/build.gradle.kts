@@ -1,3 +1,6 @@
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.KotlinMultiplatform
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.dokka)
@@ -29,7 +32,7 @@ kotlin {
         }
     }
 }
-//
+
 //val sourcesJar by tasks.registering(Jar::class) {
 //    archiveClassifier.set("sources")
 //    from(sourceSets.main.get().allSource)
@@ -41,32 +44,28 @@ val dokkaHtmlJar by tasks.registering(Jar::class) {
     archiveClassifier.set("html-docs")
 }
 
-val dokkaJavadocJar by tasks.registering(Jar::class) {
-    dependsOn(tasks.dokkaJavadoc)
-    from(tasks.dokkaJavadoc.flatMap { it.outputDirectory })
-    archiveClassifier.set("javadoc")
-}
-
-mavenPublishing {
+publishing {
     repositories {
         mavenLocal()
         maven {
             name = "frottingServicesSnapshots"
             url = uri("https://repo.frotting.services/repository/maven-snapshots/")
             credentials(PasswordCredentials::class)
-            authentication {
-                create<BasicAuthentication>("basic")
-            }
         }
         maven {
             name = "frottingServicesReleases"
             url = uri("https://repo.frotting.services/repository/maven-releases/")
             credentials(PasswordCredentials::class)
-            authentication {
-                create<BasicAuthentication>("basic")
-            }
         }
     }
+}
+
+mavenPublishing {
+    configure(KotlinMultiplatform(
+        javadocJar = JavadocJar.Dokka("dokkaHtml"),
+        sourcesJar = true,
+//        androidVariantsToPublish = listOf("debug", "release"),
+    ))
     
     coordinates(group.toString(), "kraftx-ktor", version.toString())
 
