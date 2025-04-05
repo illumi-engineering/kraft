@@ -4,8 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import sh.illumi.kraft.service.ServiceAccessor
 import sh.illumi.kraft.service.ServiceContainer
 
-abstract class Layer : ServiceAccessor() {
-    override val layer = this
+abstract class Layer : ServiceAccessor {
     override val serviceContainer = ServiceContainer(this)
     
     var parentLayer: Layer? = null

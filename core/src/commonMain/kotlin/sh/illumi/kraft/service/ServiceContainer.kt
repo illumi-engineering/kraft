@@ -1,10 +1,9 @@
 package sh.illumi.kraft.service
 
-import sh.illumi.kraft.layer.Layer
 import kotlin.reflect.KClass
 
 class ServiceContainer(
-    val parentLayer: Layer
+    val parent: ServiceAccessor
 ) {
     val serviceFactories = mutableMapOf<KClass<out Service>, ServiceFactory<*, *>>()
     val services = mutableMapOf<ServiceKey, Service>()
@@ -19,5 +18,5 @@ class ServiceContainer(
     }
     
     fun <TService : Service> getService(factory: ServiceFactory<TService, *>, accessor: ServiceAccessor? = null) =
-        factory.get(accessor ?: parentLayer)
+        factory.get(accessor ?: parent)
 }
