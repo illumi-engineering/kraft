@@ -47,11 +47,11 @@ kotlin {
     }
 }
 
-val dokkaHtmlJar by tasks.registering(Jar::class) {
-    dependsOn(tasks.dokkaHtml)
-    from(tasks.dokkaHtml.flatMap { it.outputDirectory })
-    archiveClassifier.set("html-docs")
-}
+//val dokkaHtmlJar by tasks.registering(Jar::class) {
+//    dependsOn(tasks.dokkaHtml)
+//    from(tasks.dokkaHtml.flatMap { it.outputDirectory })
+//    archiveClassifier.set("html-docs")
+//}
 
 android {
     namespace = "org.jetbrains.kotlinx.multiplatform.library.template"
