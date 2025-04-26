@@ -25,20 +25,27 @@ kotlin {
         }
     }
 
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
+    mingwX64()
+
+    macosX64()
+    macosArm64()
+
     linuxX64()
-    
+    linuxArm64()
+
     sourceSets {
         commonMain {
             dependencies {
                 implementation(project(":core"))
-                
+                implementation(project(":kraftx:logging:core"))
+
                 implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.kotlinx.datetime)
+                implementation(libs.okio)
+                implementation(libs.prettylog)
             }
         }
-        
+
         commonTest {
             dependencies {
                 implementation(libs.kotlin.test)
@@ -87,11 +94,11 @@ mavenPublishing {
         sourcesJar = true,
         androidVariantsToPublish = listOf("debug", "release"),
     ))
-    
-    coordinates(group.toString(), "kraftx-logging", version.toString())
+
+    coordinates(group.toString(), "kraftx-logging-prettylog", version.toString())
 
     pom {
-        name = "KRAFT Extensions for Logging"
+        name = "kraftx-logging prettylog integration"
         description = "KRAFT - Kotlin Resource Assembly and Flow Toolkit"
         url = "https://git.lizainslie.dev/illumi/kraft"
 

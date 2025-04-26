@@ -1,34 +1,41 @@
 [versions]
-kotlin = "2.1.10"
-kotlinx-coroutines = "1.10.1"
-slf4j = "2.0.16"
-ktor = "3.1.0"
-exposed = "0.59.0"
-hikari = "6.2.1"
 agp = "8.5.2"
 android-minSdk = "24"
 android-compileSdk = "34"
 dokka = "2.0.0"
-
+exposed = "0.59.0"
+hikari = "6.2.1"
+kotlin = "2.1.10"
+kotlinx-coroutines = "1.10.1"
+kotlinx-datetime = "0.6.2"
+ktor = "3.1.0"
+okio = "3.10.2"
+prettylog = "1.7"
+slf4j = "2.0.16"
 
 [libraries]
-dokka-androidPlugin = { module = "org.jetbrains.dokka:dokka-android-plugin", version.ref = "dokka" }
+#dokka-androidPlugin = { module = "org.jetbrains.dokka:dokka-android-plugin", version.ref = "dokka" }
 
-kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
+exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
+
+hikari = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
+
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-slf4j = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-slf4j", version.ref = "kotlinx-coroutines" }
 
-slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 
 ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
 
-exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
-exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 
-hikari = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
+prettylog = { module = "cz.lukynka:PrettyLog", version.ref = "prettylog" }
+
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 
 [plugins]
 androidLibrary = { id = "com.android.library", version.ref = "agp" }

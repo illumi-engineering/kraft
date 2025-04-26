@@ -28,7 +28,13 @@ include(":core")
 // KRAFT Extensions
 include(":kraftx:ktor")
 include(":kraftx:exposed")
-include(":kraftx:logging")
+
+// KRAFT Extensions for Logging
+include(":kraftx:logging:core")
+
+include(":kraftx:logging:prettylog")
+// todo: slf4j
 
 // Examples
 include(":examples:playground-mpp")
+include(":examples:kraftx:logging")

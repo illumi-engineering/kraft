@@ -14,6 +14,10 @@ allprojects {
             name = "frottingServicesReleases"
         }
 
+        maven("https://mvn.devos.one/releases") {
+            name = "devOS"
+        }
+
         mavenCentral()
         google()
     }

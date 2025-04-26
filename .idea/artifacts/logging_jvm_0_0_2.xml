@@ -1,8 +1,8 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="logging-jvm-0.0.2">
-    <output-path>$PROJECT_DIR$/kraftx/logging/build/libs</output-path>
+    <output-path>$PROJECT_DIR$/examples/kraftx/logging/build/libs</output-path>
     <root id="archive" name="logging-jvm-0.0.2.jar">
-      <element id="module-output" name="kraft.kraftx.logging.jvmMain" />
+      <element id="module-output" name="kraft.examples.kraftx.logging.jvmMain" />
     </root>
   </artifact>
 </component>

@@ -14,6 +14,7 @@ kotlin {
             dependencies {
                 implementation(project(":core"))
                 implementation(project(":kraftx:logging:core"))
+                implementation(project(":kraftx:logging:prettylog"))
 
                 implementation(libs.kotlinx.coroutines.core)
             }

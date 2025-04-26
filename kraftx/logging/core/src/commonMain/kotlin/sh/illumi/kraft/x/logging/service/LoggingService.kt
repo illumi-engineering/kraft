@@ -5,17 +5,29 @@ import sh.illumi.kraft.service.ServiceAccessor
 import sh.illumi.kraft.service.ServiceFactory
 import sh.illumi.kraft.x.logging.LogLevel
 import sh.illumi.kraft.x.logging.provider.LoggingProvider
+import sh.illumi.kraft.x.logging.provider.ProviderConfiguration
+import sh.illumi.kraft.x.logging.provider.ProviderDefinition
 
 class LoggingService(
     accessor: ServiceAccessor,
-    private val providerConfigs: Collection<Configuration.ProviderConfiguration>,
+    private val providerDefinitions: Collection<ProviderDefinition<*>>,
 ) : Service(accessor) {
     override val displayName = "LoggingService[${accessor::class.simpleName}]"
+
+    init {
+        for (definition in providerDefinitions)
+            definition.configureProvider()
+    }
+
+    override fun onStart() {
+        for (definition in providerDefinitions)
+            definition.provider.onInitialize()
+    }
     
     fun log(level: LogLevel, message: String) {
-        providerConfigs.forEach {
-            if (level in it.levels) it.provider.log(level, accessor, message)
-        }
+        for (definition in providerDefinitions)
+            if (level in definition.levels)
+                definition.provider.log(level, accessor, message)
     }
     
     fun trace(message: String) {
@@ -48,29 +60,15 @@ class LoggingService(
             configure: Configuration.() -> Unit
         ): LoggingService {
             val cfg = Configuration().apply(configure)
-            return LoggingService(accessor, cfg.providerConfigs)
+            return LoggingService(accessor, cfg.providerDefinitions)
         }
     }
     
     class Configuration {
-        val providerConfigs = mutableSetOf<ProviderConfiguration>()
+        val providerDefinitions = mutableSetOf<ProviderDefinition<*>>()
         
-        fun withProvider(provider: LoggingProvider, configure: ProviderConfiguration.() -> Unit) {
-            providerConfigs += ProviderConfiguration(provider).apply(configure)
-        }
-        
-        class ProviderConfiguration(
-            val provider: LoggingProvider
-        ) {
-            var levels = setOf<LogLevel>()
-            
-            fun withLevel(logLevel: LogLevel) {
-                levels = LogLevel.allFrom(logLevel)
-            }
-            
-            fun allowLevels(vararg logLevels: LogLevel) {
-                levels = logLevels.toSet()
-            }
+        fun <TConfig : ProviderConfiguration> withProvider(provider: LoggingProvider<TConfig>, configure: ProviderDefinition<TConfig>.() -> Unit) {
+            providerDefinitions += ProviderDefinition(provider).apply(configure)
         }
     }
 }

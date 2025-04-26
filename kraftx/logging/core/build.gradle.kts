@@ -6,8 +6,8 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
-    alias(libs.plugins.dokka)
     alias(libs.plugins.vanniktech.mavenPublish)
+    alias(libs.plugins.dokka)
 }
 
 group = rootProject.group
@@ -40,6 +40,8 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
+                implementation(project(":core"))
+                
                 implementation(libs.kotlinx.coroutines.core)
             }
         }
@@ -47,17 +49,10 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(libs.kotlin.test)
-                
-                implementation(libs.kotlinx.coroutines.test)
             }
         }
     }
 }
-
-//val sourcesJar by tasks.registering(Jar::class) {
-//    archiveClassifier.set("sources")
-//    from(sourceSets.jvmMain.get().allSource)
-//}
 
 //val dokkaHtmlJar by tasks.registering(Jar::class) {
 //    dependsOn(tasks.dokkaHtml)
@@ -100,14 +95,14 @@ mavenPublishing {
         androidVariantsToPublish = listOf("debug", "release"),
     ))
     
-    coordinates(group.toString(), "kraft", version.toString())
-    
+    coordinates(group.toString(), "kraftx-logging-core", version.toString())
+
     pom {
-        name = "Kraft Core"
+        name = "KRAFT Extensions for Logging"
         description = "KRAFT - Kotlin Resource Assembly and Flow Toolkit"
         url = "https://git.lizainslie.dev/illumi/kraft"
 
-        licenses { 
+        licenses {
             license {
                 name = "MIT License"
                 url = "https://opensource.org/licenses/MIT"
