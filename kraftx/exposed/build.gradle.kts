@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.vanniktech.mavenPublish)
 }
 
-group = rootProject.group
+group = "sh.illumi.kraftx"
 version = rootProject.version
 
 kotlin {

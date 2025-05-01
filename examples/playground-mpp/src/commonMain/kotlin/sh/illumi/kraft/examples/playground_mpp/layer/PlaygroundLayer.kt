@@ -16,7 +16,7 @@ class PlaygroundLayer(
     override val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
 ) : Layer() {
     val log by registering(LoggingService) {
-        withProvider(LoggingProvider.StdOut) {
+        withProvider(LoggingProvider.Companion.StdOut) {
             withLevel(LogLevel.Info)
         }
     }

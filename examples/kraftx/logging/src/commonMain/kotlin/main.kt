@@ -6,7 +6,11 @@ fun main(args: Array<String>) {
         "prettylog" -> {
             println("Starting PrettyLog example...")
             runBlocking {
-                launchLayer { PrettyLogExampleLayer }
+                val prettyLogLayer = launchLayer { scope ->
+                    PrettyLogExampleLayer(scope)
+                }
+
+                prettyLogLayer.start()
             }
         }
     }

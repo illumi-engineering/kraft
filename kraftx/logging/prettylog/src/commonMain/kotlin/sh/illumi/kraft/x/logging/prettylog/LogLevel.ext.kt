@@ -7,7 +7,7 @@ import sh.illumi.kraft.x.logging.LogLevel
 import sh.illumi.kraft.x.logging.exceptions.ExplicitLogLevelAllException
 
 fun LogLevel.toPrettyLogType(accessor: ServiceAccessor): CustomLogType {
-    val prefix = "[$display] ${accessor.label}:"
+    val prefix = "[$display] ${accessor.label}"
 
     return when (this) {
         LogLevel.All -> throw ExplicitLogLevelAllException

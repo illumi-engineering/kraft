@@ -10,7 +10,7 @@ plugins {
     alias(libs.plugins.dokka)
 }
 
-group = rootProject.group
+group = "sh.illumi.kraftx"
 version = rootProject.version
 
 kotlin {
