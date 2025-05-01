@@ -17,6 +17,8 @@ kotlin {
                 implementation(project(":kraftx:logging:prettylog"))
 
                 implementation(libs.kotlinx.coroutines.core)
+
+                implementation(libs.prettylog)
             }
         }
     }

@@ -1,3 +1,4 @@
+import cz.lukynka.prettylog.LoggerStyle
 import kotlinx.coroutines.CoroutineScope
 import sh.illumi.kraft.layer.Layer
 import sh.illumi.kraft.service.registering
@@ -11,6 +12,13 @@ class PrettyLogExampleLayer(
     val log by registering(LoggingService) {
         withProvider(PrettyLog) {
             withLevel(LogLevel.All)
+
+            configure {
+                saveToFile = true
+                saveDirectoryPath = "./logs/"
+                logFileNameFormat = "yyyy-MM-dd-Hms"
+                loggerStyle = LoggerStyle.PREFIX
+            }
         }
     }
 
