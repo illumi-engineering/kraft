@@ -1,11 +1,11 @@
-package sh.illumi.kraft.examples.playground_mpp.layer
+package sh.illumi.kraft.examples.playground.layer
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import sh.illumi.kraft.examples.playground_mpp.service.TestService
+import sh.illumi.kraft.examples.playground.service.TestService
 import sh.illumi.kraft.layer.Layer
 import sh.illumi.kraft.service.registering
 import sh.illumi.kraft.x.logging.LogLevel

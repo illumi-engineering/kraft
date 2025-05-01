@@ -1,4 +1,4 @@
-package sh.illumi.kraft.examples.playground_mpp.service
+package sh.illumi.kraft.examples.playground.service
 
 import sh.illumi.kraft.service.Service
 import sh.illumi.kraft.service.ServiceAccessor

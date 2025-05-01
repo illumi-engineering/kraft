@@ -1,3 +1,5 @@
+package sh.illumi.kraft.examples.kraftx.logging
+
 import cz.lukynka.prettylog.LoggerStyle
 import kotlinx.coroutines.CoroutineScope
 import sh.illumi.kraft.layer.Layer

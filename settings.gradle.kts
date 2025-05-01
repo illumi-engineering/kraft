@@ -36,5 +36,5 @@ include(":kraftx:logging:prettylog")
 // todo: slf4j
 
 // Examples
-include(":examples:playground-mpp")
+include(":examples:playground")
 include(":examples:kraftx:logging")

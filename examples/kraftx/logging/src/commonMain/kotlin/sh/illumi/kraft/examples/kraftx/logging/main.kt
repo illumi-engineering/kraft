@@ -1,3 +1,5 @@
+package sh.illumi.kraft.examples.kraftx.logging
+
 import kotlinx.coroutines.runBlocking
 import sh.illumi.kraft.layer.launchLayer
 
